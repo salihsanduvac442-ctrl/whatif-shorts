@@ -4,7 +4,10 @@
   "date": "2026-10-26",
   "title": "What if you dug a hole and never stopped?",
   "category": "earth",
-  "status": "produced"
+  "status": "scheduled",
+  "publish_at": "2026-10-26T16:00:00+03:00",
+  "planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=-3421798354141428543",
+  "video": "videos/2026-10-26-dig-forever.mp4"
  },
  {
   "day": 2,
