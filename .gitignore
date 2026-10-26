@@ -1,0 +1,5 @@
+episodes/*/frames/
+episodes/*/test/
+*.blend
+*.blend1
+*.wav
