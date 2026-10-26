@@ -71,8 +71,15 @@ def fx(t):
         a = t - h
         if 0 <= a < 0.45:
             e = (1 - a / 0.45) ** 3
-            z += 0.10 * e; sx += random.uniform(-1, 1) * 9 * e; sy += random.uniform(-1, 1) * 9 * e
+            z += 0.14 * e; sx += random.uniform(-1, 1) * 12 * e; sy += random.uniform(-1, 1) * 12 * e
     return z, sx, sy
+def flash(t):
+    """Short white flash on every other line start (dynamic transition)."""
+    for i, h in enumerate(hits[1:], 1):
+        a = t - h
+        if i % 2 == 0 and 0 <= a < 0.12:
+            return 0.35 * (1 - a / 0.12)
+    return 0.0
 
 cache = {}
 def raw(f):
@@ -152,6 +159,9 @@ for f in range(N):
     cx = min(max(bw / 2 + sx * bw / W, cw / 2), bw - cw / 2)
     cy = min(max(bh / 2 + sy * bh / H, ch / 2), bh - ch / 2)
     img = base.resize((W, H), Image.LANCZOS, box=(cx - cw / 2, cy - ch / 2, cx + cw / 2, cy + ch / 2))
+    fl = flash(tn)
+    if fl > 0:
+        img = Image.blend(img, Image.new("RGB", (W, H), (255, 255, 255)), fl)
     badge(img, tn)
     w, age = word_at(tn)
     if w:

@@ -5,7 +5,7 @@ import json, os, sys, subprocess
 import numpy as np, soundfile as sf
 
 ep = sys.argv[1]
-speed = float(sys.argv[2]) if len(sys.argv) > 2 else 1.34
+speed = float(sys.argv[2]) if len(sys.argv) > 2 else 1.45
 md = os.path.expanduser("~/kokoro")
 os.makedirs(md, exist_ok=True)
 base = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/"
@@ -20,7 +20,7 @@ for l in lines:
     a, sr = k.create(l, voice="am_michael", speed=speed, lang="en-us")
     idx = np.where(np.abs(a) > 0.01)[0]
     a = a[max(idx[0] - 200, 0): idx[-1] + 800]
-    gap = 0.12 if not l.endswith("...") else 0.3
+    gap = 0.08 if not l.endswith("...") else 0.2
     timing.append({"text": l, "start": t, "end": t + len(a) / sr})
     out += [a, np.zeros(int(gap * sr), dtype=a.dtype)]
     t += len(a) / sr + gap
