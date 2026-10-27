@@ -1,0 +1,121 @@
+{
+ "note": "Unscheduled topics (moved out when the body/extreme-science series was added on 2026-10-27). Use if a day needs a swap.",
+ "topics": [
+  {
+   "title": "What if dinosaurs never went extinct?",
+   "category": "dinosaurs"
+  },
+  {
+   "title": "What if a giant squid attacked a ship?",
+   "category": "ocean"
+  },
+  {
+   "title": "What if an asteroid was heading for your city?",
+   "category": "space"
+  },
+  {
+   "title": "What if your backyard turned into quicksand?",
+   "category": "earth"
+  },
+  {
+   "title": "What if aliens sent us a message tonight?",
+   "category": "ufo"
+  },
+  {
+   "title": "What if a bear broke into your kitchen?",
+   "category": "animals"
+  },
+  {
+   "title": "What if you dropped a ball through the Earth?",
+   "category": "earth"
+  },
+  {
+   "title": "What if a poltergeist moved into your attic?",
+   "category": "ghosts"
+  },
+  {
+   "title": "What if you lived inside a volcano?",
+   "category": "earth"
+  },
+  {
+   "title": "What if Earth had two Suns?",
+   "category": "space"
+  },
+  {
+   "title": "What if you found a cave under your house?",
+   "category": "earth"
+  },
+  {
+   "title": "What if the ocean disappeared?",
+   "category": "ocean"
+  },
+  {
+   "title": "What if a hurricane hit your street?",
+   "category": "weather"
+  },
+  {
+   "title": "What if a UFO hovered over your city?",
+   "category": "ufo"
+  },
+  {
+   "title": "What if you fell into a crocodile river?",
+   "category": "animals"
+  },
+  {
+   "title": "What if you were stuck on the Moon?",
+   "category": "space"
+  },
+  {
+   "title": "What if you lived in a haunted lighthouse?",
+   "category": "ghosts"
+  },
+  {
+   "title": "What if a mammoth was brought back to life?",
+   "category": "dinosaurs"
+  },
+  {
+   "title": "What if you hit an oil reserve in your yard?",
+   "category": "earth"
+  },
+  {
+   "title": "What if bees disappeared forever?",
+   "category": "animals"
+  },
+  {
+   "title": "What if a solar flare hit Earth?",
+   "category": "space"
+  },
+  {
+   "title": "What if you buried a time capsule for 1,000 years?",
+   "category": "earth"
+  },
+  {
+   "title": "What if your pool was 100 meters deep?",
+   "category": "ocean"
+  },
+  {
+   "title": "What if Area 51 opened to the public?",
+   "category": "ufo"
+  },
+  {
+   "title": "What if a blizzard buried your house?",
+   "category": "weather"
+  },
+  {
+   "title": "What if you dug until you hit diamonds?",
+   "category": "earth"
+  },
+  {
+   "title": "What if you swallowed a shrinking pill?",
+   "category": "human body"
+  },
+  {
+   "title": "What if you were the last human on Earth?",
+   "category": "human body"
+  },
+  {
+   "title": "What if you could live forever?",
+   "category": "human body"
+  }
+ ]
+}

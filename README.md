@@ -1,7 +1,7 @@
 # What If Shorts — daily challenge (Oct 26 → Dec 31, 2026)
 
 One 3D "What if...?" YouTube Short per day, published through Metricool.
-`calendar.json` holds the 67 topics (day, date, title, category, status).
+`calendar.json` holds the 67 topics (day, date, title, category, status). From day 3, odd days are body / extreme-science topics.
 
 ## Format (keep it identical every day)
 - 1080x1920, 30 fps, **25–28 s, never shorter than 25 s**.
@@ -17,6 +17,19 @@ One 3D "What if...?" YouTube Short per day, published through Metricool.
 - One-word pop captions centre screen, numbers + key nouns in yellow; a pill badge at the top
   counting the key metric (depth, distance, size, temperature, time...).
 - Dynamic transitions on every line (punch zoom, shake, flash, whoosh/boom) and a 128 bpm bed — all done by `pipeline/compose.py`.
+
+## Body / extreme-science episodes (category `body`, every other day from day 3)
+Added 2026-10-27 because "what happens to your body if..." facts get a lot of views. Same format as above, plus:
+- **Facts first.** Real physiology, in order of what happens (seconds → minutes → hours). Use real numbers
+  (temperatures, seconds, distances) and hedge where it varies by person ("for most people", "can").
+  Bust myths when the truth is surprising (e.g. tiny IV bubbles are usually harmless).
+- **Stay YouTube-safe.** No gore or realistic injuries: stylized cartoon cut-away bodies, glowing organs,
+  "inside the vein / lungs / brain" fly-throughs, cells and blood as colorful low-poly shapes.
+  Never give doses, amounts or step-by-step methods that could be used to hurt someone; frame dangerous
+  topics as "why it's dangerous and what doctors do". End on a light, curious question.
+- Visual beats: zoom from the person into the body part, show the process with simple shapes
+  (bubbles, red cells, oxygen dots, heat glow), a counter badge for the key metric (seconds, °C, meters, volts).
+- Unused original topics are kept in `backlog.json`.
 
 ## Daily runbook
 1. `git pull`. Pick the first calendar entry whose date is today (or the oldest `todo` if a day was missed).
