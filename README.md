@@ -1,7 +1,17 @@
 # What If Shorts — daily challenge (Oct 26 → Dec 31, 2026)
 
 One 3D "What if...?" YouTube Short per day, published through Metricool.
-`calendar.json` holds the 67 topics (day, date, title, category, status). From day 3, odd days are body / extreme-science topics.
+`calendar.json` holds the 67 topics (day, date, title, category, status). From day 3, odd days are body / extreme-science
+topics; even days rotate rare accident → weird animal → original "What if" topic.
+
+## Rare accidents (category `rare accident`) and weird animals (category `weird animal`)
+Added 2026-10-27, same format and safety rules as the body series below.
+- Rare accidents: real but very unlikely events (meteorite strikes, plane window failures, ball lightning,
+  molasses flood, limnic gas eruptions...). Give the real odds or the real number of known cases, what happens
+  physically, and how people survived. Never name or depict real victims; no gore — cartoon diorama only.
+- Weird animals: "What if you had <animal>'s superpower?" Show the real animal's ability with real numbers
+  (speed, force, temperature it survives), then scale it to a human in the backyard diorama. Invent your own
+  cartoon animals — never copy known characters or mascots.
 
 ## Format (keep it identical every day)
 - 1080x1920, 30 fps, **25–28 s, never shorter than 25 s**.

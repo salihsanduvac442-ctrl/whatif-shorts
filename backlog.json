@@ -2,6 +2,94 @@
  "note": "Unscheduled topics (moved out when the body/extreme-science series was added on 2026-10-27). Use if a day needs a swap.",
  "topics": [
   {
+   "title": "What if you spent one night in the most haunted house on Earth?",
+   "category": "ghosts"
+  },
+  {
+   "title": "What if you stood on the surface of the Sun?",
+   "category": "space"
+  },
+  {
+   "title": "What if a tornado lifted your house?",
+   "category": "weather"
+  },
+  {
+   "title": "What if your yard flooded 10 meters deep?",
+   "category": "weather"
+  },
+  {
+   "title": "What if you dug to the center of the Earth?",
+   "category": "earth"
+  },
+  {
+   "title": "What if an octopus was as big as a bus?",
+   "category": "animals"
+  },
+  {
+   "title": "What if you lived on Mars for a year?",
+   "category": "space"
+  },
+  {
+   "title": "What if lightning struck your pool?",
+   "category": "weather"
+  },
+  {
+   "title": "What if a megalodon was still alive?",
+   "category": "ocean"
+  },
+  {
+   "title": "What if a sinkhole opened under your house?",
+   "category": "earth"
+  },
+  {
+   "title": "What if Earth stopped spinning?",
+   "category": "space"
+  },
+  {
+   "title": "What if a ghost ship washed up on your beach?",
+   "category": "ghosts"
+  },
+  {
+   "title": "What if your house was built on a fault line?",
+   "category": "earth"
+  },
+  {
+   "title": "What if you fell into the Mariana Trench?",
+   "category": "ocean"
+  },
+  {
+   "title": "What if a UFO crashed in your garden?",
+   "category": "ufo"
+  },
+  {
+   "title": "What if spiders could fly?",
+   "category": "animals"
+  },
+  {
+   "title": "What if you planted a tree that never stopped growing?",
+   "category": "nature"
+  },
+  {
+   "title": "What if Earth had rings like Saturn?",
+   "category": "space"
+  },
+  {
+   "title": "What if a giant snake lived under your house?",
+   "category": "animals"
+  },
+  {
+   "title": "What if you could see ghosts with infrared cameras?",
+   "category": "ghosts"
+  },
+  {
+   "title": "What if all the ice on Earth melted?",
+   "category": "earth"
+  },
+  {
+   "title": "What if you traveled at the speed of light?",
+   "category": "space"
+  },
+  {
    "title": "What if dinosaurs never went extinct?",
    "category": "dinosaurs"
   },
