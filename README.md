@@ -2,8 +2,15 @@
 
 One 3D "What if...?" YouTube Short per day, published through Metricool.
 `calendar.json` holds the 68 topics (day, date, title, category, status). From day 3, odd days are body / extreme-science
-topics; even days rotate rare accident → money → weird animal → tiny army. Some odd days are money / tiny-army
-specials too — always go by the `category` field of the entry.
+topics, rotating daily from 2026-10-28: money → tiny army → body → weird animal (rare accidents take a slot when a
+series runs out). Christmas / New Year specials are slotted in on fixed dates (Nov 1 test, Dec 6, 13, 20, 24, 25, 31,
+Jan 1). Always go by the `category` field of the entry.
+
+## Christmas / New Year specials (categories `christmas`, `new year special`)
+Added 2026-10-27. Same format; snowy night diorama, warm lights, cosy colors. Real numbers again (ornament weight,
+how many homes Santa would visit and how fast he'd have to go, bulb wattage, snow density...), playful tone.
+- Santa is the generic folk figure (red suit, white beard) in our own style — no brand-specific look and no named
+  trademarked characters (e.g. don't name or copy a famous red-nosed reindeer); reindeer are generic.
 
 ## Tiny army (category `tiny army`)
 Added 2026-10-27. "What if 1 billion <tiny animal> ...?" — the smallest animals, multiplied until they matter.
