@@ -3,5 +3,3 @@ episodes/*/test/
 *.blend
 *.blend1
 *.wav
-episodes/*/frames_v2/
-__pycache__/

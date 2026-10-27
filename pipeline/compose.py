@@ -12,15 +12,15 @@ from PIL import Image, ImageDraw, ImageFont
 
 ep, OUT = sys.argv[1], sys.argv[2]
 W, H, FPS = 1080, 1920, 30
-font = ImageFont.truetype("/usr/share/fonts/truetype/google-fonts/Poppins-Bold.ttf", 136)
-badge_font = ImageFont.truetype("/usr/share/fonts/opentype/inter/Inter-Black.otf", 68)
+font = ImageFont.truetype("/usr/share/fonts/truetype/google-fonts/Poppins-Bold.ttf", 124)
+badge_font = ImageFont.truetype("/usr/share/fonts/opentype/inter/Inter-Black.otf", 64)
 random.seed(3)
 lines = json.load(open(f"{ep}/timing.json"))
 style = json.load(open(f"{ep}/style.json")) if os.path.exists(f"{ep}/style.json") else {}
 HL = set(w.upper() for w in style.get("highlight", []))
 frames = sorted(int(os.path.basename(p)[1:5]) for p in glob.glob(f"{ep}/frames/f*.png"))
 LAST = frames[-1]
-T = float(os.environ.get("END_T", lines[-1]["end"] + 0.7))   # END_T: short sample cut
+T = lines[-1]["end"] + 0.7
 N = int(T * FPS)
 
 words = []
@@ -97,18 +97,18 @@ def scene_frame(t):
 
 def caption(img, w, age):
     pop = min(age / 0.06, 1.0)
-    s = 0.78 + 0.22 * pop + 0.08 * np.sin(min(age / 0.14, 1) * np.pi)
-    fnt = font.font_variant(size=int(136 * s))
+    s = 0.7 + 0.3 * pop + 0.08 * np.sin(min(age / 0.14, 1) * np.pi)
+    fnt = font.font_variant(size=int(124 * s))
     d = ImageDraw.Draw(img)
-    bb = d.textbbox((0, 0), w, font=fnt, stroke_width=16)
+    bb = d.textbbox((0, 0), w, font=fnt, stroke_width=12)
     tw, th = bb[2] - bb[0], bb[3] - bb[1]
     if tw > W - 80:
-        fnt = font.font_variant(size=int(136 * s * (W - 80) / tw)); bb = d.textbbox((0, 0), w, font=fnt, stroke_width=16)
+        fnt = font.font_variant(size=int(124 * s * (W - 80) / tw)); bb = d.textbbox((0, 0), w, font=fnt, stroke_width=12)
         tw, th = bb[2] - bb[0], bb[3] - bb[1]
     x, y = (W - tw) / 2 - bb[0], H * 0.47 - th / 2 - bb[1]
-    d.text((x + 6, y + 12), w, font=fnt, fill=(0, 0, 0), stroke_width=16, stroke_fill=(0, 0, 0))
+    d.text((x + 5, y + 9), w, font=fnt, fill=(0, 0, 0), stroke_width=12, stroke_fill=(0, 0, 0))
     col = (255, 214, 0) if (any(c.isdigit() for c in w) or w in HL) else (255, 255, 255)
-    d.text((x, y), w, font=fnt, fill=col, stroke_width=16, stroke_fill=(10, 10, 10))
+    d.text((x, y), w, font=fnt, fill=col, stroke_width=12, stroke_fill=(10, 10, 10))
 
 def badge(img, t):
     txt = badge_text(t)
@@ -118,8 +118,7 @@ def badge(img, t):
     bb = d.textbbox((0, 0), txt, font=badge_font)
     tw, th = bb[2] - bb[0], bb[3] - bb[1]
     x0, y0 = (W - tw) / 2 - 40, 250
-    d.rounded_rectangle((x0, y0, x0 + tw + 80, y0 + th + 50), radius=40, fill=(12, 12, 18, 255),
-                        outline=(255, 255, 255, 255), width=5)       # solid pill, no see-through
+    d.rounded_rectangle((x0, y0, x0 + tw + 80, y0 + th + 50), radius=40, fill=(0, 0, 0, 170))
     d.text((x0 + 40 - bb[0], y0 + 25 - bb[1]), txt, font=badge_font, fill=(255, 255, 255))
 
 # ---- audio ----
