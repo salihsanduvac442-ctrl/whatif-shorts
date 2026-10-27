@@ -7,7 +7,9 @@
   "status": "scheduled",
   "publish_at": "2026-10-26T16:00:00+03:00",
   "planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=-3421798354141428543",
-  "video": "videos/2026-10-26-dig-forever.mp4"
+  "video": "videos/2026-10-26-dig-forever.mp4",
+  "tiktok_publish_at": "2026-10-27T15:10:00+03:00",
+  "tiktok_planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=-4620164122652227538"
  },
  {
   "day": 2,
@@ -17,7 +19,9 @@
   "status": "scheduled",
   "publish_at": "2026-10-27T16:00:00+03:00",
   "planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=2455174976627755469",
-  "video": "videos/2026-10-27-ufo-backyard.mp4"
+  "video": "videos/2026-10-27-ufo-backyard.mp4",
+  "tiktok_publish_at": "2026-10-27T16:00:00+03:00",
+  "tiktok_planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=-4456188155422159652"
  },
  {
   "day": 3,
