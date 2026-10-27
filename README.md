@@ -2,7 +2,16 @@
 
 One 3D "What if...?" YouTube Short per day, published through Metricool.
 `calendar.json` holds the 68 topics (day, date, title, category, status). From day 3, odd days are body / extreme-science
-topics; even days rotate rare accident → money → weird animal → original "What if" topic (plus 4 extra money days).
+topics; even days rotate rare accident → money → weird animal → tiny army. Some odd days are money / tiny-army
+specials too — always go by the `category` field of the entry.
+
+## Tiny army (category `tiny army`)
+Added 2026-10-27. "What if 1 billion <tiny animal> ...?" — the smallest animals, multiplied until they matter.
+- Start from ONE animal with its real numbers (mass in mg, bite volume, lift power, light output, speed), then
+  multiply live on screen with a counter badge (1 → 1,000 → 1 million → 1 billion) and show the total next to
+  something familiar (car, house, blue whale, stadium). Real examples help: locust swarms really reach billions.
+- Cute cartoon insects / krill / plankton, never scary-realistic; no gore. For mosquitoes etc. show
+  "why it's dangerous" in simple terms, not injury detail.
 
 ## Money scale (category `money`)
 Added 2026-10-27. "How big / heavy / long is this much money?" — a counter badge climbs ($1K → $10K → $1M → $1B)

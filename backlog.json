@@ -2,6 +2,66 @@
  "note": "Unscheduled topics (moved out when the body/extreme-science series was added on 2026-10-27). Use if a day needs a swap.",
  "topics": [
   {
+   "title": "What if you dove to the bottom of the ocean?",
+   "category": "ocean"
+  },
+  {
+   "title": "What if you stopped drinking water for a week?",
+   "category": "body"
+  },
+  {
+   "title": "What if a volcano erupted under your lawn?",
+   "category": "earth"
+  },
+  {
+   "title": "What if you were in a falling elevator?",
+   "category": "body"
+  },
+  {
+   "title": "What if a meteor hit your backyard?",
+   "category": "space"
+  },
+  {
+   "title": "What if you breathed pure oxygen all day?",
+   "category": "body"
+  },
+  {
+   "title": "What if ants were the size of dogs?",
+   "category": "animals"
+  },
+  {
+   "title": "What if you were swallowed by a whale?",
+   "category": "body"
+  },
+  {
+   "title": "What if the Moon crashed into Earth?",
+   "category": "space"
+  },
+  {
+   "title": "What if your house was haunted for 100 years?",
+   "category": "ghosts"
+  },
+  {
+   "title": "What if you fell through the ice of a frozen lake?",
+   "category": "body"
+  },
+  {
+   "title": "What if a blue whale swam into your pool?",
+   "category": "animals"
+  },
+  {
+   "title": "What if you stepped into space without a suit?",
+   "category": "body"
+  },
+  {
+   "title": "What if you fell into a black hole?",
+   "category": "space"
+  },
+  {
+   "title": "What if you got struck by lightning?",
+   "category": "body"
+  },
+  {
    "title": "What if a hailstone the size of a melon fell on you?",
    "category": "rare accident"
   },
