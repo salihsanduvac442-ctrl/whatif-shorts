@@ -6,11 +6,12 @@ ep = sys.argv[1]
 pct = int(sys.argv[2]) if len(sys.argv) > 2 else 40
 spp = int(sys.argv[3]) if len(sys.argv) > 3 else 8
 only = [int(x) for x in sys.argv[4:]]
-bpy.ops.wm.open_mainfile(filepath=f"{ep}/scene.blend")
+BLEND = os.environ.get("BLEND", "scene.blend")
+bpy.ops.wm.open_mainfile(filepath=f"{ep}/{BLEND}")
 sc = bpy.context.scene
 sc.render.resolution_percentage = pct
 sc.cycles.samples = spp
-out = f"{ep}/test" if only else f"{ep}/frames"
+out = f"{ep}/test" if only else f"{ep}/" + os.environ.get("FRAMES_DIR", "frames")
 os.makedirs(out, exist_ok=True)
 frames = only or range(sc.frame_start, sc.frame_end + 1, 2)
 for f in frames:
