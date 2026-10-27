@@ -2,34 +2,6 @@
  "note": "Unscheduled topics (moved out when the body/extreme-science series was added on 2026-10-27). Use if a day needs a swap.",
  "topics": [
   {
-   "title": "What if you got trapped in extreme heat?",
-   "category": "body"
-  },
-  {
-   "title": "What if you ate the world's hottest pepper?",
-   "category": "body"
-  },
-  {
-   "title": "What if a penny fell on you from a skyscraper?",
-   "category": "body"
-  },
-  {
-   "title": "What if you held in a sneeze?",
-   "category": "body"
-  },
-  {
-   "title": "What if you drank only ocean water?",
-   "category": "body"
-  },
-  {
-   "title": "What if a black widow bit you?",
-   "category": "body"
-  },
-  {
-   "title": "What if a tapeworm lived inside you?",
-   "category": "body"
-  },
-  {
    "title": "What if you dove to the bottom of the ocean?",
    "category": "ocean"
   },

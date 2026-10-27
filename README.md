@@ -1,7 +1,12 @@
-# What If Shorts — daily challenge (Oct 26, 2026 → Jan 1, 2027)
+# What If Shorts — daily challenge (Oct 26, 2026 → Feb 1, 2027, then ongoing)
+
+Oct 26 → Jan 1 is the trial period; the calendar runs to Feb 1 (day 99) and the channel keeps going at least until
+100 Shorts and beyond. When the calendar runs out, append the next day yourself: keep the rotation
+money → tiny army → body → weird animal, take topics from `backlog.json` (remove them there) or write new ones in the
+same style (never repeat a title), then produce as usual.
 
 One 3D "What if...?" YouTube Short per day, published through Metricool.
-`calendar.json` holds the 68 topics (day, date, title, category, status). From day 3, odd days are body / extreme-science
+`calendar.json` holds one topic per day (day, date, title, category, status). From day 3, odd days are body / extreme-science
 topics, rotating daily from 2026-10-28: money → tiny army → body → weird animal (rare accidents take a slot when a
 series runs out). Christmas / New Year specials are slotted in on fixed dates (Nov 1 test, Dec 6, 13, 20, 24, 25, 31,
 Jan 1). Always go by the `category` field of the entry.
