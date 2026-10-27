@@ -53,6 +53,12 @@ Added 2026-10-27, same format and safety rules as the body series below.
   Hook question in the first 1.5 s, no intro.
 - Stylized low-poly 3D in Blender (Cycles), bright cartoon colors, cross-section / diorama look
   (reference: viral "What if" house + soil cut-away shorts).
+- **Clarity rules (Salih, 2026-10-27):** keep this exact design, but every shape and text must read clearly.
+  `pipeline/render.py` applies `pipeline/clarity.py` automatically: bold dark outline on every shape, and
+  **nothing see-through on screen** — transparent / glass / water materials are made opaque and light beams,
+  halos and light cones become solid glowing bars. In new scenes don't use `alpha < 1` or transmission at all;
+  show beams as solid glowing bars/rings. Captions and the top badge are solid (thick stroke, opaque pill).
+  The "v2" look (`look_v2.py`, `grade.py`, `compose_v2.py`) was tried and rejected: don't use it.
 - Narration: Kokoro `am_michael`, speed 1.45 (tts.py default), last line is a question
   to drive comments ("So... would you ...?"). Do not push speech faster than ~1.5 — it stops being clear;
   get the extra pace from more lines and more on-screen events instead.

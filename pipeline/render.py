@@ -9,6 +9,10 @@ only = [int(x) for x in sys.argv[4:]]
 BLEND = os.environ.get("BLEND", "scene.blend")
 bpy.ops.wm.open_mainfile(filepath=f"{ep}/{BLEND}")
 sc = bpy.context.scene
+if not os.environ.get("NO_CLARITY"):                  # house rules: outlines + nothing see-through
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import clarity
+    print("CLARITY", clarity.apply(sc), flush=True)
 sc.render.resolution_percentage = pct
 sc.cycles.samples = spp
 out = f"{ep}/test" if only else f"{ep}/" + os.environ.get("FRAMES_DIR", "frames")
