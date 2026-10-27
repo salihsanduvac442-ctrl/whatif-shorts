@@ -20,7 +20,7 @@ style = json.load(open(f"{ep}/style.json")) if os.path.exists(f"{ep}/style.json"
 HL = set(w.upper() for w in style.get("highlight", []))
 frames = sorted(int(os.path.basename(p)[1:5]) for p in glob.glob(f"{ep}/frames/f*.png"))
 LAST = frames[-1]
-T = lines[-1]["end"] + 0.7
+T = float(os.environ.get("END_T", lines[-1]["end"] + 0.7))   # END_T: short sample cut
 N = int(T * FPS)
 
 words = []
