@@ -2,7 +2,18 @@
 
 One 3D "What if...?" YouTube Short per day, published through Metricool.
 `calendar.json` holds the 68 topics (day, date, title, category, status). From day 3, odd days are body / extreme-science
-topics; even days rotate rare accident → weird animal → original "What if" topic.
+topics; even days rotate rare accident → money → weird animal → original "What if" topic (plus 4 extra money days).
+
+## Money scale (category `money`)
+Added 2026-10-27. "How big / heavy / long is this much money?" — a counter badge climbs ($1K → $10K → $1M → $1B)
+while stacks of cartoon bills / pallets / piles grow next to a person, house, truck, stadium for scale.
+- Use real, checked numbers. US bills: ~1 g each, 15.6 cm long, ~0.11 mm thick. So in $100 bills:
+  $1,000 ≈ 10 g, $100K ≈ 1 kg, $1M ≈ 10 kg, $1B ≈ 10 tonnes (in $1 bills it is 100x heavier/longer).
+  A US penny weighs 2.5 g.
+- For "a billion dollars of X" (rice, water, gold, trees) look up a current typical price with WebSearch on the
+  day, say "about", and give the result in a relatable unit (Olympic pools, trucks, football fields, Earth laps).
+  Gold price changes daily: always search it.
+- Bills are generic cartoon money (no real banknote designs, portraits or serial numbers).
 
 ## Rare accidents (category `rare accident`) and weird animals (category `weird animal`)
 Added 2026-10-27, same format and safety rules as the body series below.

@@ -2,6 +2,54 @@
  "note": "Unscheduled topics (moved out when the body/extreme-science series was added on 2026-10-27). Use if a day needs a swap.",
  "topics": [
   {
+   "title": "What if a hailstone the size of a melon fell on you?",
+   "category": "rare accident"
+  },
+  {
+   "title": "What if a rogue wave hit your ship?",
+   "category": "rare accident"
+  },
+  {
+   "title": "What if a vending machine tipped over on you?",
+   "category": "rare accident"
+  },
+  {
+   "title": "What if you froze solid like a wood frog?",
+   "category": "weird animal"
+  },
+  {
+   "title": "What if you had the eyes of an eagle?",
+   "category": "weird animal"
+  },
+  {
+   "title": "What if you ran as fast as a cheetah?",
+   "category": "weird animal"
+  },
+  {
+   "title": "What if a T-rex walked down your street?",
+   "category": "dinosaurs"
+  },
+  {
+   "title": "What if aliens abducted your house?",
+   "category": "ufo"
+  },
+  {
+   "title": "What if you got stung by 1,000 bees?",
+   "category": "body"
+  },
+  {
+   "title": "What if you were frozen and woken up 100 years later?",
+   "category": "body"
+  },
+  {
+   "title": "What if you never saw sunlight for 30 days?",
+   "category": "body"
+  },
+  {
+   "title": "What if you got the wrong blood type?",
+   "category": "body"
+  },
+  {
    "title": "What if you spent one night in the most haunted house on Earth?",
    "category": "ghosts"
   },
