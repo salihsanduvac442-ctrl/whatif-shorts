@@ -14,7 +14,10 @@
   "date": "2026-10-27",
   "title": "What if a UFO landed in your backyard?",
   "category": "ufo",
-  "status": "todo"
+  "status": "scheduled",
+  "publish_at": "2026-10-27T16:00:00+03:00",
+  "planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=2455174976627755469",
+  "video": "videos/2026-10-27-ufo-backyard.mp4"
  },
  {
   "day": 3,
