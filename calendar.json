@@ -477,5 +477,12 @@
   "title": "What if you got stung by 1,000 bees?",
   "category": "body",
   "status": "todo"
+ },
+ {
+  "day": 68,
+  "date": "2027-01-01",
+  "title": "What if every firework on Earth went off at midnight?",
+  "category": "new year special",
+  "status": "todo"
  }
 ]

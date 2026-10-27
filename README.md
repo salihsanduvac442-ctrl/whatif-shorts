@@ -1,7 +1,7 @@
-# What If Shorts — daily challenge (Oct 26 → Dec 31, 2026)
+# What If Shorts — daily challenge (Oct 26, 2026 → Jan 1, 2027)
 
 One 3D "What if...?" YouTube Short per day, published through Metricool.
-`calendar.json` holds the 67 topics (day, date, title, category, status). From day 3, odd days are body / extreme-science
+`calendar.json` holds the 68 topics (day, date, title, category, status). From day 3, odd days are body / extreme-science
 topics; even days rotate rare accident → weird animal → original "What if" topic.
 
 ## Rare accidents (category `rare accident`) and weird animals (category `weird animal`)
