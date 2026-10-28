@@ -53,10 +53,20 @@ Added 2026-10-27, same format and safety rules as the body series below.
   Hook question in the first 1.5 s, no intro.
 - Stylized low-poly 3D in Blender (Cycles), bright cartoon colors, cross-section / diorama look
   (reference: viral "What if" house + soil cut-away shorts).
-- **Design is locked (Salih, 2026-10-27):** keep exactly this look, captions, badge and edit. Two alternative
-  looks were tried that day (phrase captions + grade, outlines + no transparency) and rejected — don't bring
-  them back. What matters every day: each visual beat and effect must match the line being spoken and the
-  caption on screen at that moment (show the thing the word names, on that word), and keep it flowing fast.
+- **Design (Salih, 2026-10-28): "reference style"** — chosen after a side-by-side test of day 3
+  (`episodes/003-lift-million-ref`, look at `docs/style-reference.png`, viral backyard cut-away shorts).
+  Build every new scene from `episodes/003-lift-million-ref/scene.py` (copy its ground material, house, garden
+  props and `overhead()` camera helper):
+  - mowed lawn with wide diagonal two-tone stripes (`grass_m`), the same material on the far lawn;
+  - the diorama's front cut face close to the action (FRONT_Y about -1.6, ground 12 m deep) so textured,
+    cracked brown soil fills the lower part of most shots;
+  - a lived-in garden: house with blue shutters, terracotta tile roof, stone patio, pots, white chairs, hedges,
+    a pool;
+  - camera in a 3/4 overhead view (`overhead()` raises low shots), still always moving;
+  - Standard view transform, exposure about -0.6, sun 4.2, 12 samples.
+  Keep the cartoon characters/props, the captions, the badge and the edit exactly as before; shapes and text
+  must stay large and clear. Each visual beat and effect must match the line being spoken and the caption on
+  screen at that moment (show the thing the word names, on that word), and keep it flowing fast.
 - Narration: Kokoro `am_michael`, speed 1.45 (tts.py default), last line is a question
   to drive comments ("So... would you ...?"). Do not push speech faster than ~1.5 — it stops being clear;
   get the extra pace from more lines and more on-screen events instead.
@@ -82,8 +92,8 @@ Added 2026-10-27 because "what happens to your body if..." facts get a lot of vi
 2. `episodes/NNN-slug/script.json` — write the lines (facts must be accurate; hedge where science is uncertain).
 3. `pip install bpy kokoro-onnx soundfile --break-system-packages` then `python3 pipeline/tts.py episodes/NNN-slug`
    → `timing.json` (line start times). Target 25–28 s total; if shorter than 25 s, add lines (don't slow the voice).
-4. Write `episodes/NNN-slug/scene.py` (Blender, start from `episodes/001-dig-forever/scene.py`
-   for helpers: mat/box/cyl/sphere/tube, layered ground shader, house, trees, sky, camera rig).
+4. Write `episodes/NNN-slug/scene.py` (Blender, start from `episodes/003-lift-million-ref/scene.py`
+   for the reference style and helpers: mat/box/cyl/sphere/tube, layered ground shader, house, trees, sky, camera rig).
    Scene length = narration length + 0.7 s at 24 fps, keyframes placed at the `timing.json` line starts.
    Camera framing: 9:16 portrait, lens 26 mm ⇒ only about ±4.3 units are visible horizontally at 11 units distance;
    put every detail inside that window and IN FRONT of cut faces (not buried behind them).
