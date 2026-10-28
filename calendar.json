@@ -28,7 +28,12 @@
   "date": "2026-10-28",
   "title": "What if you tried to lift a million dollars?",
   "category": "money",
-  "status": "todo"
+  "status": "scheduled",
+  "publish_at": "2026-10-28T16:00:00+03:00",
+  "planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=4127831576087773971",
+  "video": "videos/2026-10-28-lift-million.mp4",
+  "tiktok_publish_at": "2026-10-28T16:00:00+03:00",
+  "tiktok_planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=1568133400115760328"
  },
  {
   "day": 4,
