@@ -1,4 +1,4 @@
-# Day 3 — What if you tried to lift a million dollars?
+# Day 3 — What if you tried to lift a million dollars? ($1M -> $10M -> $100M -> $1B, updated Oct 28)
 # Build: python3 episodes/003-lift-million/scene.py   (writes scene.blend next to this file)
 # Helpers (mat/box/cyl/sphere/tube/group/attach/pop) adapted from episodes/001 + 002.
 # Units: 1 Blender unit = 1 metre, real sizes where it matters (bill 15.6 x 6.6 cm, $1M in $1s ~1.1 m3).
@@ -214,12 +214,16 @@ bpy.ops.mesh.primitive_plane_add(size=1200, location=(0, 0, -4.05))
 bpy.context.object.data.materials.append(under_m)
 far = mat("LawnFar", (0.3, 0.6, 0.2), 0.95)
 bpy.ops.mesh.primitive_plane_add(size=1, location=(0, 0, -0.03))
-fp = bpy.context.object; fp.scale = (4000, 400000, 1); fp.location = (0, 200050, -0.03)
+fp = bpy.context.object; fp.scale = (400000, 400000, 1); fp.location = (0, 200050, -0.03)
 fp.data.materials.append(far)
 stone_m = mat("Stone", (0.7, 0.66, 0.6), 0.8)
 for i in range(30):
     sphere("Peb", (random.uniform(-30, 30), FRONT_Y - 0.02, random.uniform(-3.6, -0.6)), random.uniform(0.12, 0.3),
            stone_m, scale=(1.3, 0.5, 0.8), sub=1, smooth=False)
+
+for sx in (-1, 1):   # lawn beside the diorama (no void at the sides)
+    bpy.ops.mesh.primitive_plane_add(size=1, location=(sx * 100016, 22, -0.03))
+    o = bpy.context.object; o.scale = (199968, 56, 1); o.data.materials.append(far)
 
 # ---------------- house + trees ----------------
 wall_m = mat("Wall", (0.98, 0.88, 0.7), 0.85)
@@ -391,40 +395,114 @@ pop(case_t, S[4] + 4, 6, S[5] + 3)
 case_h = briefcase("CaseHand", 0.4, -0.05, 0.6, math.radians(90))
 attach([case_h], you)
 hide_until(case_h, S[5] + 3)
-# "Easy!" hop
-for f, z in [(S[5] + 2, 0), (S[5] + 7, 0.35), (S[5] + 12, 0), (S[5] + 15, 0.12), (S[5] + 18, 0)]:
+
+# ---------------- money scale-up (lines 5-17) ----------------
+# Real numbers ($100 bills: 1 g, 15.6 x 6.6 cm, 0.11 mm, ~1.13 cm3 each):
+#   $10M  = 100,000 bills = 100 kg, 0.113 m3 (cube ~0.48 m), stack 11 m
+#   $100M = 1,000,000 bills = 1 t, 1.13 m3 (one pallet 1.2 x 1.0 x ~0.95 m)
+#   $1B   = 10,000,000 bills = 10 t, 10 pallets, stack 1.1 km (Burj-class tallest building ~830 m)
+band_green = stripe_mat("Stack100", (0.3, 0.68, 0.25), (0.95, 0.75, 0.3), axis="Z", freq=6.0, thresh=0.8)
+band_big = stripe_mat("Stack1B", (0.3, 0.68, 0.25), (0.95, 0.75, 0.3), axis="Z", freq=0.06, thresh=0.8)
+
+def lerp_plank(theta, off):
+    """World position of a point `off` m from the pivot along the plank top, for plank angle theta (rad)."""
+    return (PX + off * math.cos(theta), PZ + 0.06 - off * math.sin(theta))
+
+# "Easy!" hop with the case, then a jump onto the seesaw's right end
+for f, z in [(S[5] + 1, 0), (S[5] + 5, 0.35), (S[5] + 9, 0)]:
     you.location = (0, 0, z); you.keyframe_insert("location", frame=f)
 
-# ---------------- seesaw: $1M in $1 bills vs a small car (lines 5-7) ----------------
+# ---------------- seesaw ----------------
 PX, PZ = 4.2, 0.76
 steel = mat("Steel", (0.95, 0.75, 0.2), 0.5)
 pivot = cyl("Pivot", (PX, 0, 0.15), 0.55, 0.7, mat("PivotM", (0.3, 0.32, 0.38), 0.6), verts=3)
 pivot.rotation_mode = 'ZXY'; pivot.rotation_euler = (math.radians(90), 0, math.radians(90))
 plank = group("Plank", (PX, 0, PZ))
-pl = box("PlankBoard", (PX, 0, PZ), (7.5, 0.9, 0.12), steel, bevel=0.02)
-cube = group("CashCube", (PX - 3.0, 0, PZ + 0.06))
-cparts = [box("Cube", (PX - 3.0, 0, PZ + 0.06 + 0.52), (1.04, 1.04, 1.04), cash_cube_m, bevel=0.01)]
-for dx in (-0.35, 0, 0.35):
-    cparts.append(box("CubeBand", (PX - 3.0 + dx, 0, PZ + 0.06 + 0.52), (0.08, 1.06, 1.045), band1))
-attach(cparts, cube)
-attach([pl, cube], plank)
-for o in (pivot, plank):
-    pop(o, S[5] + 14, 7, S[10] + 6)
-# cube drops in (local z) then the plank slams down on the cash side
-cube.location = (PX - 3.0, 0, PZ + 6.0); cube.keyframe_insert("location", frame=S[6] - 1)
-cube.location = (PX - 3.0, 0, PZ + 0.06); cube.keyframe_insert("location", frame=S[6] + 6)
-hide_until(cube, S[6])
-TILT = math.radians(-10.6)
-plank.rotation_euler = (0, 0, 0); plank.keyframe_insert("rotation_euler", frame=S[6] + 6)
-plank.rotation_euler = (0, TILT, 0); plank.keyframe_insert("rotation_euler", frame=S[6] + 11)
-plank.keyframe_insert("rotation_euler", frame=S[7] + 6)
-plank.rotation_euler = (0, math.radians(2.5), 0); plank.keyframe_insert("rotation_euler", frame=S[7] + 11)
-plank.rotation_euler = (0, math.radians(-1.0), 0); plank.keyframe_insert("rotation_euler", frame=S[7] + 15)
-plank.rotation_euler = (0, 0, 0); plank.keyframe_insert("rotation_euler", frame=S[7] + 19)
-# you strain against the ton of cash
-for f, a in [(S[6] + 6, 0), (S[6] + 10, 14), (S[6] + 16, 10), (S[6] + 22, 15), (S[7] + 4, 0)]:
-    you.rotation_euler = (0, math.radians(a), 0); you.keyframe_insert("rotation_euler", frame=f)
+pl = box("PlankBoard", (PX, 0, PZ), (7.5, 1.15, 0.12), steel, bevel=0.02)
 
+# $10M cube (100 kg) on the left end
+C10 = 0.48
+cube = group("Cube10M", (PX - 3.0, 0, PZ + 0.06))
+cparts = [box("Cube", (PX - 3.0, 0, PZ + 0.06 + C10 / 2), (C10, C10, C10), cash_cube_m, bevel=0.008)]
+for dx in (-0.12, 0.12):
+    cparts.append(box("CubeBand", (PX - 3.0 + dx, 0, PZ + 0.06 + C10 / 2), (0.05, C10 + 0.01, C10 + 0.005), band100))
+attach(cparts, cube)
+
+# $100M pallet (1 ton) on the left end
+pallet_wood = mat("PalletWood", (0.78, 0.6, 0.38), 0.85)
+def pallet(name, cx, cy, cz):
+    g = group(name, (cx, cy, cz))
+    pp = []
+    for dy in (-0.42, 0, 0.42):
+        pp.append(box("Runner", (cx, cy + dy, cz + 0.05), (1.2, 0.12, 0.1), pallet_wood))
+    pp.append(box("Deck", (cx, cy, cz + 0.12), (1.2, 1.0, 0.04), pallet_wood))
+    pp.append(box("Cash", (cx, cy, cz + 0.14 + 0.475), (1.16, 0.98, 0.95), cash_cube_m, bevel=0.01))
+    for dx in (-0.4, 0, 0.4):
+        pp.append(box("PBand", (cx + dx, cy, cz + 0.14 + 0.475), (0.06, 0.99, 0.955), band100))
+    attach(pp, g)
+    return g
+pal = pallet("Pallet100M", PX - 2.8, 0, PZ + 0.06)
+attach([pl, cube, pal], plank)
+pop(pivot, S[5] + 8, 7)
+pop(plank, S[5] + 8, 7)
+
+T6 = math.radians(5.0)        # you alone: right end dips
+TILT = math.radians(-10.6)    # cash side slams down
+def plank_rot(keys):
+    for f, a in keys:
+        plank.rotation_euler = (0, a, 0); plank.keyframe_insert("rotation_euler", frame=f)
+plank_rot([(S[5] + 16, 0), (S[5] + 20, T6), (S[6] + 3, T6), (S[6] + 8, TILT),
+           (S[8] + 1, TILT), (S[8] + 6, 0), (S[8] + 11, 0), (S[8] + 15, TILT),
+           (S[10] + 6, TILT), (S[10] + 11, math.radians(2.5)), (S[10] + 15, math.radians(-1.0)), (S[10] + 19, 0)])
+
+# cube: drops in on line 5, gone on line 8
+cube.location = (PX - 3.0, 0, PZ + 5.0); cube.keyframe_insert("location", frame=S[6] - 3)
+cube.location = (PX - 3.0, 0, PZ + 0.06); cube.keyframe_insert("location", frame=S[6] + 3)
+hide_until(cube, S[6] - 3); gone_at(cube, S[8] + 2, 3)
+# pallet: drops on line 8
+pal.location = (PX - 2.8, 0, PZ + 7.0); pal.keyframe_insert("location", frame=S[8] + 5)
+pal.location = (PX - 2.8, 0, PZ + 0.06); pal.keyframe_insert("location", frame=S[8] + 11)
+hide_until(pal, S[8] + 5)
+
+# you: jump onto the right end, ride it, get launched, hop off on line 8
+OFF = 2.6
+def on_plank(theta, lift=0.0):
+    x, z = lerp_plank(theta, OFF)
+    return (x, 0, z + lift)
+you_keys = [
+    (S[5] + 9,  (0, 0, 0), 0),
+    (S[5] + 13, (3.4, 0, 2.0), 0),
+    (S[5] + 16, on_plank(0), 0),
+    (S[5] + 20, on_plank(T6), T6),
+    (S[6] + 3,  on_plank(T6), T6),
+    (S[6] + 8,  on_plank(TILT, 0.9), TILT),      # boing!
+    (S[6] + 12, on_plank(TILT, 0.15), TILT),
+    (S[6] + 14, on_plank(TILT), TILT),
+    (S[8] + 1,  on_plank(TILT), TILT),
+    (S[8] + 5,  (8.2, -0.6, 2.0), 0),
+    (S[8] + 9,  (8.8, -1.2, 0), 0),
+]
+for f, p, a in you_keys:
+    you.location = p; you.keyframe_insert("location", frame=f)
+    you.rotation_euler = (0, a, 0); you.keyframe_insert("rotation_euler", frame=f)
+# wobble on top while the cube outweighs you
+for f, a in [(S[6] + 14, 0), (S[6] + 18, 8), (S[6] + 22, -6), (S[7], 0)]:
+    you.rotation_euler = (0, TILT + math.radians(a), 0); you.keyframe_insert("rotation_euler", frame=f)
+
+# ---------------- line 7: $10M stacked = 11 m next to the house ----------------
+SX, SY = 7.6, 14.5
+st10 = group("Stack10M", (SX, SY, 0))
+sb = box("Stack10MBox", (SX, SY, 5.5), (0.34, 0.2, 11.0), band_green)
+attach([sb], st10)
+st10.scale = (1, 1, 0.001); st10.keyframe_insert("scale", frame=0); st10.keyframe_insert("scale", frame=S[7])
+st10.scale = (1, 1, 1.08); st10.keyframe_insert("scale", frame=S[7] + 18)
+st10.scale = (1, 1, 1.0); st10.keyframe_insert("scale", frame=S[7] + 23)
+gone_at(st10, S[11], 4)
+lab_m = mat("LabelM", (1.0, 0.85, 0.2), 0.4, emit=(1.0, 0.8, 0.2), emit_strength=0.8)
+lab11 = text("Lab11", "11 m", (SX + 1.6, SY - 0.2, 11.0), 1.5, lab_m, extrude=0.04)
+pop(lab11, S[7] + 18, 6, S[8] + 2)
+
+# ---------------- line 10: small car balances the pallet ----------------
 carbody = mat("CarBody", (0.2, 0.55, 0.95), 0.35)
 glass = mat("CarGlass", (0.25, 0.35, 0.45), 0.1)
 tyre_m = mat("Tyre", (0.06, 0.06, 0.06), 0.9)
@@ -442,147 +520,83 @@ for dy in (-0.5, 0.5):
     cp.append(sphere("Headlight", (CX - 1.6, dy, 0.7), 0.1, head_m, sub=1))
 attach(cp, car)
 up_z = PZ + 0.06 + 2.1 * math.sin(-TILT)
-key_loc(car, [(S[7] - 1, (CX, 0, 9.0)), (S[7] + 6, (CX, 0, up_z)), (S[7] + 11, (CX, 0, PZ + 0.06 - 2.1 * math.sin(math.radians(2.5)))),
-              (S[7] + 15, (CX, 0, PZ + 0.06 + 2.1 * math.sin(math.radians(1.0)))), (S[7] + 19, (CX, 0, PZ + 0.06))])
-car.rotation_euler = (0, 0.4, 0); car.keyframe_insert("rotation_euler", frame=S[7])
-car.rotation_euler = (0, TILT, 0); car.keyframe_insert("rotation_euler", frame=S[7] + 6)
-car.rotation_euler = (0, math.radians(2.5), 0); car.keyframe_insert("rotation_euler", frame=S[7] + 11)
-car.rotation_euler = (0, math.radians(-1.0), 0); car.keyframe_insert("rotation_euler", frame=S[7] + 15)
-car.rotation_euler = (0, 0, 0); car.keyframe_insert("rotation_euler", frame=S[7] + 19)
-hide_until(car, S[7]); gone_at(car, S[10] + 6, 4)
+key_loc(car, [(S[10] - 1, (CX, 0, 9.0)), (S[10] + 6, (CX, 0, up_z)), (S[10] + 11, (CX, 0, PZ + 0.06 - 2.1 * math.sin(math.radians(2.5)))),
+              (S[10] + 15, (CX, 0, PZ + 0.06 + 2.1 * math.sin(math.radians(1.0)))), (S[10] + 19, (CX, 0, PZ + 0.06))])
+car.rotation_euler = (0, 0.4, 0); car.keyframe_insert("rotation_euler", frame=S[10])
+car.rotation_euler = (0, TILT, 0); car.keyframe_insert("rotation_euler", frame=S[10] + 6)
+car.rotation_euler = (0, math.radians(2.5), 0); car.keyframe_insert("rotation_euler", frame=S[10] + 11)
+car.rotation_euler = (0, math.radians(-1.0), 0); car.keyframe_insert("rotation_euler", frame=S[10] + 15)
+car.rotation_euler = (0, 0, 0); car.keyframe_insert("rotation_euler", frame=S[10] + 19)
+hide_until(car, S[10])
 
-# ---------------- 110 m tower of $1 bills + statue (lines 8-10) ----------------
-TWX, TWY = -4.0, 3.0
-TW_H = 110.0
-tower = group("Tower", (TWX, TWY, 0))
-tw = box("TowerBox", (TWX, TWY, TW_H / 2), (2.6, 1.6, TW_H), cash_stack_m)
-attach([tw], tower)
-tower.scale = (1, 1, 0.001); tower.keyframe_insert("scale", frame=0); tower.keyframe_insert("scale", frame=S[8])
-tower.scale = (1, 1, 0.15); tower.keyframe_insert("scale", frame=S[8] + 10)
-tower.scale = (1, 1, 1.0); tower.keyframe_insert("scale", frame=S[8] + 34)
-# tips over toward +y at line 10, lands flat ("laid end to end")
-tower.rotation_euler = (0, 0, 0); tower.keyframe_insert("rotation_euler", frame=S[10] + 1)
-tower.rotation_euler = (math.radians(-20), 0, 0); tower.keyframe_insert("rotation_euler", frame=S[10] + 8)
-tower.rotation_euler = (math.radians(-90), 0, 0); tower.keyframe_insert("rotation_euler", frame=S[10] + 16)
-key_loc(tower, [(S[10] + 1, (TWX, TWY, 0)), (S[10] + 16, (TWX, TWY, 0.8))])
-# ribbon of bills to the horizon (156 km)
-rib = group("Ribbon", (TWX, TWY + TW_H, 0))
-rb = box("RibbonBox", (TWX, TWY + TW_H + 78000, 0.05), (2.6, 156000, 0.1), cash_stack_m)
-attach([rb], rib)
-rib.scale = (1, 0.0001, 1); rib.keyframe_insert("scale", frame=0); rib.keyframe_insert("scale", frame=S[10] + 15)
-rib.scale = (1, 0.004, 1); rib.keyframe_insert("scale", frame=S[10] + 26)
-rib.scale = (1, 1, 1); rib.keyframe_insert("scale", frame=S[11] - 2)
-hide_until(rib, S[10] + 15)
-
-# generic green robed statue with a torch (public-domain landmark, simple low-poly)
-patina = mat("Patina", (0.38, 0.7, 0.58), 0.6)
-stone2 = mat("Pedestal", (0.82, 0.78, 0.68), 0.8)
-flame_m = glow_mat("Flame", (1.0, 0.7, 0.15), 8.0)
-STX, STY = -22.0, 14.0
-statue = group("Statue", (STX, STY, 0))
-stp = [box("Ped1", (STX, STY, 14), (16, 16, 28), stone2, bevel=0.4),
-       box("Ped2", (STX, STY, 37.5), (11, 11, 19), stone2, bevel=0.3),
-       cyl("Robe", (STX, STY, 47 + 15), 5.2, 30, patina, r2=2.6, verts=12),
-       sphere("Shoulders", (STX, STY, 77.5), 3.2, patina, scale=(1.1, 0.8, 0.7), sub=1, smooth=False),
-       sphere("HeadS", (STX, STY - 0.3, 81.5), 2.0, patina, sub=1, smooth=False),
-       tube("Arm", [(STX + 2.6, STY, 77.5), (STX + 3.6, STY - 0.3, 83), (STX + 3.8, STY - 0.4, 88.5)], [1.0, 0.9, 0.8], patina),
-       cyl("TorchCup", (STX + 3.8, STY - 0.4, 90), 1.4, 2.2, patina, r2=0.6, verts=10, rot=(math.radians(180), 0, 0)),
-       sphere("TorchFlame", (STX + 3.8, STY - 0.4, 92.0), 1.2, flame_m, scale=(1, 1, 1.4), sub=1, smooth=False),
-       box("Tablet", (STX - 3.0, STY - 1.2, 72), (1.6, 0.8, 4.0), patina, rot=(0, math.radians(-15), 0))]
-for k in range(7):
-    a = math.radians(-90 + (k - 3) * 28)
-    stp.append(cyl("Spike", (STX + 2.0 * math.cos(a), STY - 0.3 + 0.6 * math.sin(a) * 0, 83.2 + 1.3 * math.sin(a + math.pi / 2) * 0 + 1.4),
-                   0.35, 2.4, patina, r2=0.02, verts=6, rot=(0, math.radians((k - 3) * 22), 0)))
-attach(stp, statue)
-statue.scale = (0.001,) * 3; statue.keyframe_insert("scale", frame=0); statue.keyframe_insert("scale", frame=S[9])
-statue.scale = (1, 1, 1.06); statue.keyframe_insert("scale", frame=S[9] + 10)
-statue.scale = (1, 1, 1.0); statue.keyframe_insert("scale", frame=S[9] + 14)
-
-# ---------------- pennies (lines 11-16) ----------------
-PNX, PNY = 4.5, 4.5
-def coin(name, loc, r, th, rot=(0, 0, 0)):
-    o = cyl(name, loc, r, th, copper_m, rot=rot, verts=20)
-    return o
-penny = group("GiantPenny", (13, 0.8, 1.15))
-gp = [cyl("PennyBody", (13, 0.8, 1.15), 1.15, 0.2, copper_m, rot=(math.radians(90), 0, 0), verts=40),
-      cyl("PennyFace", (13, 0.8 - 0.06, 1.15), 0.92, 0.1, copper2_m, rot=(math.radians(90), 0, 0), verts=40),
-      text("PennyText", "1¢", (13, 0.8 - 0.115, 1.15), 0.9, mat("PennyInk", (0.55, 0.25, 0.1), 0.4, metal=0.6), extrude=0.01)]
-attach(gp, penny)
-key_loc(penny, [(S[11] - 1, (13, 0.8, 1.15)), (S[11] + 14, (5.0, 0.8, 1.15)), (S[12] + 2, (4.6, 0.8, 1.15))])
-penny.rotation_euler = (0, math.radians(-540), 0); penny.keyframe_insert("rotation_euler", frame=S[11] - 1)
-penny.rotation_euler = (0, 0, 0); penny.keyframe_insert("rotation_euler", frame=S[11] + 14)
-hide_until(penny, S[11]); gone_at(penny, S[12] + 5, 4)
-
-pile = group("Pile", (PNX, PNY, 0))
-PR, PH = 4.6, 2.6
-pile_m = stripe_mat("PileM", (0.85, 0.45, 0.22), (0.98, 0.62, 0.32), axis="X", freq=9.0, thresh=0.6, rough=0.35, metal=0.8)
-pparts = [cyl("PileCone", (PNX, PNY, PH / 2), PR, PH, pile_m, r2=0.25, verts=40)]
-for i in range(170):
-    rho = PR * math.sqrt(random.uniform(0.0, 0.95))
-    a = random.uniform(0, 2 * math.pi)
-    z = PH * (1 - rho / PR) + 0.02
-    pparts.append(coin("PileCoin", (PNX + rho * math.cos(a), PNY + rho * math.sin(a), z), 0.17, 0.04,
-                       rot=(random.uniform(-0.6, 0.6), random.uniform(-0.6, 0.6), 0)))
-attach(pparts, pile)
-pile.scale = (0.001,) * 3; pile.keyframe_insert("scale", frame=0); pile.keyframe_insert("scale", frame=S[12])
-pile.scale = (0.35,) * 3; pile.keyframe_insert("scale", frame=S[12] + 8)
-pile.scale = (0.75,) * 3; pile.keyframe_insert("scale", frame=S[13])
-pile.scale = (1.0,) * 3; pile.keyframe_insert("scale", frame=S[13] + 14)
-# coin rain
-for i in range(90):
-    rho = PR * math.sqrt(random.uniform(0, 0.8)); a = random.uniform(0, 2 * math.pi)
-    x, y = PNX + rho * math.cos(a), PNY + rho * math.sin(a)
-    zl = PH * (1 - rho / PR) * 0.9
-    f0 = S[12] + random.randint(0, S[14] - S[12] - 8)
-    c = coin("RainCoin", (x, y, 14), 0.17, 0.04)
-    key_loc(c, [(f0, (x + random.uniform(-1, 1), y, random.uniform(10, 16))), (f0 + 9, (x, y, zl + 0.1))])
-    c.rotation_euler = (random.uniform(0, 6), random.uniform(0, 6), 0); c.keyframe_insert("rotation_euler", frame=f0)
-    c.rotation_euler = (c.rotation_euler[0] + 8, c.rotation_euler[1] + 5, 0); c.keyframe_insert("rotation_euler", frame=f0 + 9)
-    hide_until(c, f0); gone_at(c, f0 + 14, 3)
-
-# two cartoon blue whales (~25 m each)
-whale_m = mat("Whale", (0.25, 0.45, 0.85), 0.5)
-belly_m = mat("Belly", (0.8, 0.88, 0.95), 0.6)
-eye_w = mat("EyeW", (1, 1, 1), 0.4); eye_k = mat("EyeK", (0.03, 0.03, 0.05), 0.3)
-whales = []
-for k, wx in enumerate((14.0, 20.0)):
-    WY = 10.0
-    g = group(f"Whale{k}", (wx, WY, 0))
-    wp = [sphere("WBody", (wx, WY, 2.1), 1.0, whale_m, scale=(2.4, 11.0, 2.1), sub=3),
-          sphere("WBelly", (wx, WY - 1.5, 1.5), 1.0, belly_m, scale=(2.0, 8.5, 1.4), sub=3),
-          tube("WTail", [(wx, WY + 9.5, 2.1), (wx, WY + 13.0, 2.4)], [1.0, 0.45], whale_m),
-          box("WFluke", (wx, WY + 13.6, 2.4), (5.2, 1.4, 0.3), whale_m, bevel=0.3),
-          box("WFinL", (wx - 2.6, WY - 3.5, 1.2), (2.4, 1.0, 0.25), whale_m, bevel=0.2, rot=(0, math.radians(-25), math.radians(20))),
-          box("WFinR", (wx + 2.6, WY - 3.5, 1.2), (2.4, 1.0, 0.25), whale_m, bevel=0.2, rot=(0, math.radians(25), math.radians(-20)))]
-    for sx in (-1, 1):
-        wp.append(sphere("WEye", (wx + sx * 1.75, WY - 7.6, 2.0), 0.4, eye_w, sub=2))
-        wp.append(sphere("WPupil", (wx + sx * 1.95, WY - 7.85, 2.0), 0.22, eye_k, sub=1))
-    wp.append(tube("WMouth", [(wx - 1.6, WY - 9.2, 1.5), (wx, WY - 10.3, 1.35), (wx + 1.6, WY - 9.2, 1.5)], [0.08] * 3, eye_k))
-    attach(wp, g)
-    f0 = S[14] + 1 + 4 * k
-    key_loc(g, [(f0 - 1, (wx, WY, 26)), (f0 + 7, (wx, WY, -0.2)), (f0 + 10, (wx, WY, 0.4)), (f0 + 13, (wx, WY, 0))])
-    hide_until(g, f0); gone_at(g, S[15] + 3, 3)
-    whales.append(g)
-
-# a dozen dump trucks full of pennies
-cab_m = mat("TruckCab", (1.0, 0.75, 0.1), 0.5)
-bed_m = mat("TruckBed", (0.55, 0.58, 0.62), 0.5, metal=0.3)
-for k in range(12):
-    tx = 13.5 if k % 2 == 0 else 19.5
-    ty = -1.0 + 4.6 * (k // 2)
-    g = group(f"Truck{k}", (tx, ty, 0))
-    tp = [box("Cab", (tx, ty - 1.5, 1.2), (2.2, 1.4, 1.6), cab_m, bevel=0.1),
-          box("CabWin", (tx, ty - 2.21, 1.5), (1.8, 0.04, 0.6), glass),
-          box("Chassis", (tx, ty, 0.55), (2.2, 4.4, 0.3), tyre_m),
-          box("Bed", (tx, ty + 0.75, 1.3), (2.3, 2.9, 1.2), bed_m, bevel=0.06),
-          sphere("Load", (tx, ty + 0.75, 1.85), 1.0, pile_m, scale=(1.1, 1.4, 0.55), sub=2, smooth=False)]
-    for dx in (-1.1, 1.1):
-        for dy in (-1.5, 0.3, 1.5):
-            tp.append(cyl("TWheel", (tx + dx, ty + dy, 0.45), 0.45, 0.35, tyre_m, rot=(0, math.radians(90), 0), verts=16))
-    attach(tp, g)
-    f0 = S[15] + 2 + k
-    key_loc(g, [(f0 - 1, (tx, ty - 10, 0)), (f0 + 6, (tx, ty, 0)), (FRAMES, (tx, ty + 6, 0))])
+# ---------------- lines 11-12: $1B = ten pallets (10 tons) ----------------
+BX, BY = 14.0, 6.0
+for k in range(10):
+    i, lvl = k % 5, k // 5
+    px, pz = BX + (i - 2) * 1.3, lvl * 1.12
+    g = pallet(f"PalletB{k}", px, BY, pz)
+    f0 = S[11] + 3 + 2 * k
+    key_loc(g, [(f0 - 1, (px, BY, pz + 9.0)), (f0 + 6, (px, BY, pz)), (f0 + 8, (px, BY, pz + 0.08)), (f0 + 10, (px, BY, pz))])
     hide_until(g, f0)
+
+# ---------------- line 13: cartoon elephant (~6 t) ----------------
+ele_m = mat("Elephant", (0.6, 0.62, 0.68), 0.75)
+ear_m = mat("EarIn", (0.85, 0.62, 0.65), 0.7)
+tusk_m = mat("Tusk", (0.98, 0.96, 0.9), 0.4)
+EX, EY = 20.8, 6.6
+ele = group("Elephant", (EX, EY, 0))
+ep = [sphere("EBody", (EX, EY, 2.4), 1.0, ele_m, scale=(1.45, 2.1, 1.3), sub=3),
+      sphere("EHead", (EX, EY - 2.0, 3.0), 0.95, ele_m, sub=3),
+      tube("ETrunk", [(EX, EY - 2.75, 2.75), (EX, EY - 3.15, 1.9), (EX, EY - 3.05, 0.9), (EX, EY - 3.35, 0.55)],
+           [0.33, 0.25, 0.18, 0.14], ele_m),
+      tube("ETail", [(EX, EY + 2.05, 2.7), (EX + 0.1, EY + 2.4, 1.8)], [0.07, 0.05], ele_m)]
+for sx in (-1, 1):
+    ep.append(sphere("EEar", (EX + sx * 1.15, EY - 1.75, 3.05), 1.0, ele_m, scale=(0.95, 0.16, 1.05), sub=2))
+    ep.append(sphere("EEarIn", (EX + sx * 1.12, EY - 1.86, 3.0), 1.0, ear_m, scale=(0.72, 0.06, 0.82), sub=2))
+    ep.append(cyl("ETusk", (EX + sx * 0.4, EY - 2.85, 2.25), 0.09, 0.7, tusk_m, r2=0.02, verts=10,
+                  rot=(math.radians(120), 0, 0)))
+    ep.append(sphere("EEye", (EX + sx * 0.42, EY - 2.82, 3.3), 0.1, eye_k := mat("EyeK", (0.03, 0.03, 0.05), 0.3), sub=1))
+    for dy in (-1.15, 1.15):
+        ep.append(cyl("ELeg", (EX + sx * 0.75, EY + dy, 0.85), 0.4, 1.7, ele_m, verts=14))
+attach(ep, ele)
+f0 = S[13] + 2
+key_loc(ele, [(f0 - 1, (EX, EY, 14)), (f0 + 7, (EX, EY, -0.15)), (f0 + 10, (EX, EY, 0.25)), (f0 + 13, (EX, EY, 0))])
+hide_until(ele, f0)
+
+# ---------------- lines 14-16: $1B stack (1.1 km) vs the tallest building (~830 m) ----------------
+TBX, TBY = 0.0, 420.0
+tb = group("Stack1B", (TBX, TBY, 0))
+tbp = [box("Stack1BBox", (TBX, TBY, 550), (6.0, 4.0, 1100), band_big),
+       box("Stack1BCap", (TBX, TBY, 1100.6), (6.6, 4.6, 1.2), mat("CapGold", (1.0, 0.8, 0.25), 0.3, metal=0.9))]
+tbp.append(text("Lab1B", "$1B", (TBX, TBY - 2.5, 1112), 14, lab_m, extrude=0.6))
+attach(tbp, tb)
+tb.scale = (1, 1, 0.001); tb.keyframe_insert("scale", frame=0); tb.keyframe_insert("scale", frame=S[14])
+tb.scale = (1, 1, 0.25); tb.keyframe_insert("scale", frame=S[14] + 8)
+tb.scale = (1, 1, 1.0); tb.keyframe_insert("scale", frame=S[15] + 6)
+
+# cloud layer the stack pokes through (~450-520 m)
+for k in range(46):
+    a = random.uniform(0, 2 * math.pi); r = random.uniform(18, 260)
+    cx, cy = TBX + r * math.cos(a) + 60, TBY + r * math.sin(a) + 40
+    sphere("HiCloud", (cx, cy, random.uniform(450, 520)), random.uniform(14, 30), cloud_m, scale=(1.5, 1.1, 0.55), sub=2)
+
+# generic tallest building: stepped glass tower + spire (no specific real design)
+glass_t = stripe_mat("TowerGlass", (0.62, 0.78, 0.9), (0.3, 0.42, 0.55), axis="Z", freq=1.6, thresh=0.6, rough=0.15, metal=0.4)
+KX, KY = 150.0, 520.0
+sky = group("Skyscraper", (KX, KY, 0))
+segs = [(70, 60, 150), (56, 48, 150), (44, 38, 150), (32, 28, 130), (22, 20, 110), (13, 12, 70)]
+kp, z = [], 0.0
+for wx, wy, h in segs:
+    kp.append(box("KSeg", (KX, KY, z + h / 2), (wx, wy, h), glass_t))
+    z += h
+kp.append(cyl("KSpire", (KX, KY, z + 34), 4.0, 68, mat("Spire", (0.85, 0.88, 0.92), 0.3, metal=0.8), r2=0.4, verts=10))
+attach(kp, sky)
+sky.scale = (1, 1, 0.001); sky.keyframe_insert("scale", frame=0); sky.keyframe_insert("scale", frame=S[16])
+sky.scale = (1, 1, 1.0); sky.keyframe_insert("scale", frame=S[16] + 12)
+lab_k = text("LabK", "830 m", (KX, KY - 10, 870), 22, mat("LabKM", (1, 1, 1), 0.4, emit=(1, 1, 1), emit_strength=0.8), extrude=0.8)
+pop(lab_k, S[16] + 12, 6)
+lab_b = text("LabB", "1,100 m", (TBX - 40, TBY - 10, 1150), 22, lab_m, extrude=0.8)
+pop(lab_b, S[16] + 14, 6)
 
 # ---------------- camera ----------------
 bpy.ops.object.camera_add()
@@ -609,32 +623,35 @@ cam_keys = [
     (S[4] - 2,   (TX - 0.2, TY - 1.25, PT + 0.42), (TX + 0.02, TY, PT + 0.1)),
     (S[4] + 7,   (SA[0] - 0.55, SA[1] - 1.0, PT + 0.45), (SA[0], SA[1], PT + 0.17)),  # briefcase
     (S[5] - 2,   (SA[0] + 0.2, SA[1] - 1.1, PT + 0.4), (SA[0], SA[1], PT + 0.17)),
-    (S[5] + 6,   (1.4, -4.4, 1.6),    (0.6, 0, 1.0)),            # Easy! hop with the case
-    (S[6] - 2,   (2.6, -8.0, 2.3),    (2.6, 0, 0.9)),
-    (S[6] + 8,   (1.8, -6.2, 1.9),    (1.2, 0, 0.9)),            # a ton of singles slams the seesaw
-    (S[7] - 2,   (3.0, -8.4, 2.4),    (3.3, 0, 0.9)),
-    (S[7] + 8,   (4.6, -9.6, 2.9),    (4.2, 0, 1.2)),            # small car balances it
-    (S[8] - 2,   (3.6, -9.2, 2.5),    (4.2, 0, 1.2)),
-    (S[8] + 4,   (2.0, -11.0, 1.2),   (TWX, TWY, 3.0)),          # tower shoots up
-    (S[8] + 20,  (4.0, -42.0, 16),    (TWX, TWY, 30)),
-    (S[9] - 2,   (6.0, -92.0, 48),    (-7, 4, 55)),
-    (S[9] + 12,  (-12.0, -96.0, 52),  (-11, 6, 52)),            # taller than the statue
-    (S[10] - 2,  (-16.0, -98.0, 55),  (-11, 6, 52)),
-    (S[10] + 10, (16.0, -48.0, 34),   (TWX, 45, 6)),             # it tips over
-    (S[10] + 24, (-3.4, -16.0, 16.0), (TWX, 260, 0)),            # skim along the 156 km ribbon
-    (S[11] - 2,  (-4.4, -12.0, 12.0), (TWX, 420, 0)),
-    (S[11] + 5,  (6.5, -6.5, 1.6),    (9.0, 0.8, 1.1)),          # giant penny rolls in
-    (S[12] - 2,  (4.0, -6.2, 1.5),    (5.0, 0.8, 1.15)),
-    (S[12] + 8,  (0.0, -10.0, 5.0),   (PNX, PNY, 1.2)),          # 100 million coins rain down
-    (S[13] - 2,  (2.0, -11.0, 4.6),   (PNX, PNY, 1.2)),
-    (S[13] + 10, (12.0, -9.5, 4.6),   (PNX - 1, PNY - 1, 1.4)),  # 250 tons (you for scale)
-    (S[14] - 2,  (12.5, -6.0, 4.2),   (PNX - 1, PNY - 1, 1.4)),
-    (S[14] + 10, (-3.0, -28.0, 14),   (11, 8, 2.5)),             # two blue whales
-    (S[15] - 2,  (0.0, -29.0, 12),    (11, 8, 2.5)),
-    (S[15] + 10, (30.0, -20.0, 15),   (14, 9, 1.5)),             # a dozen trucks
-    (S[16] - 2,  (26.0, -26.0, 13),   (14, 9, 1.5)),
-    (S[16] + 12, (2.2, -5.6, 1.8),    (0.8, 0.5, 1.2)),          # you, the case, the pile
-    (FRAMES - 1, (1.3, -3.8, 1.5),    (0.6, 0.3, 1.2)),
+    (S[5] + 5,   (1.4, -4.4, 1.6),    (0.6, 0, 1.0)),            # Easy! hop with the case
+    (S[5] + 16,  (3.6, -8.6, 2.3),    (4.0, 0, 1.0)),            # seesaw, you jump on
+    (S[6] + 2,   (2.6, -7.0, 2.0),    (2.8, 0, 1.0)),            # $10M cube lands
+    (S[6] + 12,  (4.6, -9.4, 2.7),    (4.3, 0, 1.3)),            # you get launched
+    (S[7] - 2,   (5.2, -9.8, 2.9),    (4.6, 0, 1.4)),
+    (S[7] + 4,   (11.0, 4.0, 1.4),    (SX, SY, 4.0)),            # 11 m stack by the house
+    (S[7] + 20,  (12.0, 2.5, 3.0),    (SX - 1.0, SY, 5.6)),
+    (S[8] - 2,   (11.0, 1.5, 3.4),    (SX - 1.5, SY, 5.4)),
+    (S[8] + 8,   (2.4, -6.4, 2.8),    (1.6, 0, 1.3)),            # pallet drops on the left end
+    (S[9] - 2,   (0.6, -4.2, 2.0),    (1.4, 0, 1.0)),
+    (S[9] + 12,  (2.4, -3.8, 1.7),    (1.4, 0, 0.9)),            # one ton
+    (S[10] - 2,  (4.0, -9.0, 2.7),    (4.2, 0, 1.2)),            # car balances it
+    (S[10] + 14, (4.8, -9.6, 3.0),    (4.4, 0, 1.2)),
+    (S[11] - 2,  (6.4, -10.2, 3.3),   (6.0, 0, 1.4)),
+    (S[11] + 8,  (12.0, -9.0, 5.5),   (BX, BY, 1.4)),            # ten pallets rain down
+    (S[12] - 2,  (16.5, -7.5, 4.2),   (BX, BY, 1.2)),
+    (S[12] + 12, (8.5, -5.0, 3.2),    (BX + 1.0, BY, 1.3)),      # ten tons
+    (S[13] - 2,  (11.0, -7.0, 3.4),   (BX + 3.0, BY, 1.6)),
+    (S[13] + 12, (17.0, -6.2, 3.2),   (EX - 1.5, EY, 2.0)),      # elephant
+    (S[14] - 2,  (19.2, -6.4, 3.0),   (EX - 1.5, EY, 2.0)),
+    (S[14] + 3,  (9.0, 388.0, 2.5),   (TBX, TBY, 60)),           # base of the $1B stack, looking up
+    (S[14] + 20, (34.0, 330.0, 240),  (TBX, TBY, 480)),
+    (S[15] - 2,  (44.0, 300.0, 400),  (TBX, TBY, 640)),
+    (S[15] + 12, (40.0, 300.0, 600),  (TBX, TBY, 500)),          # punching through the clouds
+    (S[16] - 2,  (48.0, 292.0, 650),  (TBX, TBY, 560)),
+    (S[16] + 14, (420.0, -120.0, 950), (70, 470, 760)),          # vs the tallest building
+    (S[17] - 2,  (440.0, -150.0, 960), (70, 470, 760)),
+    (S[17] + 12, (10.6, -6.4, 2.0),   (8.8, -1.2, 1.1)),         # back to you
+    (FRAMES - 1, (9.8, -4.6, 1.7),    (8.6, -1.1, 1.1)),
 ]
 for f, cl, tl in cam_keys:
     cam.location = cl; cam.keyframe_insert("location", frame=f)

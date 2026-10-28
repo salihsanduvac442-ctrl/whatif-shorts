@@ -25,63 +25,68 @@
   "end": 8.262041666666667
  },
  {
-  "text": "Easy! Now switch to one-dollar bills.",
+  "text": "Easy! Now make it ten million.",
   "start": 8.342041666666667,
-  "end": 9.798416666666666
+  "end": 9.46325
  },
  {
-  "text": "A million singles weigh about a ton.",
-  "start": 9.878416666666666,
-  "end": 11.170833333333333
+  "text": "A hundred kilos. Heavier than you!",
+  "start": 9.54325,
+  "end": 10.880458333333333
+ },
+ {
+  "text": "Stacked up, it's eleven meters tall.",
+  "start": 10.960458333333333,
+  "end": 12.2175
+ },
+ {
+  "text": "Now... one hundred million dollars.",
+  "start": 12.2975,
+  "end": 13.565624999999999
+ },
+ {
+  "text": "One full pallet. A whole ton.",
+  "start": 13.645624999999999,
+  "end": 14.775833333333333
  },
  {
   "text": "As heavy as a small car.",
-  "start": 11.250833333333333,
-  "end": 12.281708333333333
+  "start": 14.855833333333333,
+  "end": 15.886708333333333
  },
  {
-  "text": "Stack them up... over a hundred meters tall.",
-  "start": 12.361708333333333,
-  "end": 14.061458333333333
+  "text": "Now... one billion dollars.",
+  "start": 15.966708333333333,
+  "end": 17.016541666666665
  },
  {
-  "text": "Taller than the Statue of Liberty.",
-  "start": 14.141458333333333,
-  "end": 15.276291666666665
+  "text": "Ten million bills. Ten tons.",
+  "start": 17.096541666666667,
+  "end": 18.391000000000002
  },
  {
-  "text": "Laid end to end, they'd stretch 156 kilometers.",
-  "start": 15.356291666666666,
-  "end": 17.995124999999998
+  "text": "Heavier than an African elephant.",
+  "start": 18.471,
+  "end": 19.613375
  },
  {
-  "text": "Now try pennies.",
-  "start": 18.075125,
-  "end": 18.79975
+  "text": "Stacked up? Over a kilometer tall.",
+  "start": 19.693375,
+  "end": 21.071916666666667
  },
  {
-  "text": "That's one hundred million coins.",
-  "start": 18.87975,
-  "end": 20.127083333333335
+  "text": "It pokes right through the clouds.",
+  "start": 21.151916666666665,
+  "end": 22.260166666666663
  },
  {
-  "text": "Two hundred fifty tons of metal.",
-  "start": 20.207083333333333,
-  "end": 21.532125
+  "text": "Taller than the world's tallest building!",
+  "start": 22.340166666666665,
+  "end": 23.63945833333333
  },
  {
-  "text": "About as heavy as two blue whales.",
-  "start": 21.612125,
-  "end": 22.848166666666664
- },
- {
-  "text": "You'd need a dozen big trucks.",
-  "start": 22.928166666666666,
-  "end": 23.97908333333333
- },
- {
-  "text": "So... which million would you carry home?",
-  "start": 24.059083333333334,
-  "end": 25.480375
+  "text": "So... which pile could you carry home?",
+  "start": 23.719458333333332,
+  "end": 25.093999999999998
  }
 ]
