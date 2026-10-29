@@ -40,7 +40,12 @@
   "date": "2026-10-29",
   "title": "What if 1 billion ladybugs landed on your house?",
   "category": "tiny army",
-  "status": "todo"
+  "status": "awaiting_approval",
+  "publish_at": "2026-10-29T16:00:00+03:00",
+  "planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=3067541743157855308",
+  "video": "videos/2026-10-29-ladybugs.mp4",
+  "tiktok_publish_at": "2026-10-29T16:00:00+03:00",
+  "tiktok_planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=8008467850343564054"
  },
  {
   "day": 5,
