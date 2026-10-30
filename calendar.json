@@ -52,7 +52,12 @@
   "date": "2026-10-30",
   "title": "What if an air bubble got into your vein?",
   "category": "body",
-  "status": "todo"
+  "status": "awaiting_approval",
+  "publish_at": "2026-10-30T16:00:00+03:00",
+  "planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=4181296953641091446",
+  "video": "videos/2026-10-30-air-bubble.mp4",
+  "tiktok_publish_at": "2026-10-30T16:00:00+03:00",
+  "tiktok_planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=-1743995663476700076"
  },
  {
   "day": 6,
