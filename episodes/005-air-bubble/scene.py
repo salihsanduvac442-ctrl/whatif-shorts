@@ -324,7 +324,7 @@ box("PoolWater", (POX, POY, 0.06), (5.8, 3.2, 0.06), mat("PoolWaterM", (0.25, 0.
 #   Prevention: nurses remove air from lines, infusion pumps have air-in-line alarms. Treatment: 100% oxygen,
 #   positioning, hyperbaric (pressure) chambers. Divers: decompression sickness ("the bends") = gas bubbles.
 #   No volumes / doses are given anywhere (YouTube-safe, not a how-to).
-# Cartoon scale: organs and vessels are giant props in the backyard diorama.
+# v2 (Salih, 2026-10-30): told on the body of a man sitting in a garden chair — cut-away chest + arm vein.
 # =====================================================================================
 
 def recenter(o, bottom=False):
@@ -411,134 +411,169 @@ def bubble(name, loc, r):
     attach(p, g)
     return g
 
-# ---------------- layout ----------------
-VY, VZ, VR = 0.4, 0.72, 0.6        # vein (cut-away half pipe) along X
-VX0, VX1 = -11.0, 0.25
-HCX, HCY, HCZ = 0.75, 0.75, 1.55    # heart centre
-AY, AZ, AR = 0.65, 1.45, 0.42       # pulmonary artery
-AX0, AX1 = 1.6, 4.65
-LX1, LX2, LY, LZ = 5.45, 7.05, 1.2, 1.95   # lung lobes
-NX, NY, NZ = 5.45, 0.42, 1.9        # capillary net
-IVX, IVY = -6.6, 0.95                # IV pole
-
-half_pipe("Vein", VX0, VX1, VY, VZ, VR, vein_m)
-half_pipe("Artery", AX0, AX1, AY, AZ, AR, art_m)
-plasma_m = mat("Plasma", (0.95, 0.75, 0.55), 0.3, emit=(0.9, 0.6, 0.4), emit_strength=0.15)
-box("PlasmaV", ((VX0 + VX1) / 2, VY, VZ - VR + 0.12), (VX1 - VX0, 0.62, 0.04), plasma_m)
-box("PlasmaA", ((AX0 + AX1) / 2, AY, AZ - AR + 0.09), (AX1 - AX0, 0.42, 0.03), plasma_m)
-for (x, h) in [(-9.0, VZ - VR), (-3.2, VZ - VR)]:
-    box("VeinProp", (x, VY, h / 2 + 0.01), (0.3, 0.3, h), mat("PropM", (0.85, 0.85, 0.82), 0.6))
-for x in (2.2, 4.0):
-    box("ArtProp", (x, AY, (AZ - AR) / 2), (0.22, 0.22, AZ - AR), mat("PropM2", (0.85, 0.85, 0.82), 0.6))
-
-# ---- blood cells flowing (keys on even frames: render uses every 2nd frame) ----
-bpy.ops.mesh.primitive_torus_add(major_radius=0.12, minor_radius=0.065, major_segments=16, minor_segments=8)
-RBC = bpy.context.object.data; sc.collection.objects.unlink(bpy.context.object)
-def flow(n, x0, x1, y, z, r, speed, material, size):
-    L = x1 - x0
-    for i in range(n):
-        o = bpy.data.objects.new("Cell", RBC); sc.collection.objects.link(o)
-        if not o.data.materials:
-            pass
-        o.data.materials.clear() if False else None
-        o.active_material = material
-        o.material_slots[0].link = 'OBJECT'; o.material_slots[0].material = material
-        ph = random.uniform(0, L)
-        cy = y + random.uniform(-0.45, 0.45) * r
-        cz = z - r + 0.17 + random.uniform(0, 0.55) * r
-        rx, ry = random.uniform(0, 3), random.uniform(0, 3)
-        for f in range(0, FRAMES + 2, 2):
-            x = x0 + (ph + speed * f) % L
-            vis = x0 + 0.25 < x < x1 - 0.3
-            o.location = (x, cy + 0.05 * math.sin(f * 0.2 + i), cz + 0.04 * math.sin(f * 0.25 + i))
-            o.rotation_euler = (rx + f * 0.05, ry, 0)
-            o.scale = (size if vis else 0.001,) * 3
-            o.keyframe_insert("location", frame=f); o.keyframe_insert("scale", frame=f); o.keyframe_insert("rotation_euler", frame=f)
-RBC.materials.append(cell_m)
-flow(30, VX0, VX1, VY, VZ, VR, 0.10, cell_m, 1.0)
-flow(12, AX0, AX1, AY, AZ, AR, 0.07, cellb_m, 0.75)
-
-# ---------------- heart (cartoon) ----------------
-heart = group("Heart", (HCX, HCY, HCZ))
-hp = [sphere("HLobeL", (HCX - 0.5, HCY, HCZ + 0.35), 0.78, heart_m, scale=(1, 0.75, 1), sub=3),
-      sphere("HLobeR", (HCX + 0.5, HCY, HCZ + 0.35), 0.78, heart_m, scale=(1, 0.75, 1), sub=3),
-      cyl("HTip", (HCX, HCY, HCZ - 0.55), 0.06, 1.5, heart_m, r2=1.22, verts=32)]
-hp[2].scale = (1, 0.62, 1)
+# ---------------- the man in the garden chair (big cartoon, facing the camera) ----------------
+skin_m = mat("Skin", (0.95, 0.74, 0.58), 0.6)
+shorts_m = mat("Shorts", (0.2, 0.42, 0.85), 0.7)
+hair_m = mat("ManHair", (0.28, 0.16, 0.07), 0.8)
+chair_w = mat("BigChair", (0.97, 0.97, 0.95), 0.5)
+MY = 1.95
+# chair
+box("CSeat", (0, 2.0, 1.0), (1.9, 1.6, 0.12), chair_w, bevel=0.03)
+box("CBack", (0, 2.78, 2.1), (1.9, 0.12, 2.2), chair_w, bevel=0.03)
+for x in (-0.85, 0.85):
+    for y in (1.3, 2.7):
+        box("CLeg", (x, y, 0.47), (0.1, 0.1, 0.94), chair_w)
+box("CArm", (0.98, 2.0, 1.55), (0.12, 1.4, 0.08), chair_w)
+box("CArmPost", (0.98, 1.35, 1.28), (0.08, 0.08, 0.5), chair_w)
+# side table under the left arm (IV arm)
+box("STable", (-2.0, 1.4, 1.45), (1.6, 0.9, 0.08), mat("STableM", (0.75, 0.5, 0.28), 0.7), bevel=0.02)
+for x in (-2.7, -1.3):
+    for y in (1.05, 1.75):
+        box("STLeg", (x, y, 0.71), (0.07, 0.07, 1.42), mat("STLegM", (0.6, 0.4, 0.22), 0.7))
+# body
+sphere("Torso", (0, MY, 2.05), 1.0, skin_m, scale=(0.78, 0.48, 1.0), sub=3)
+sphere("Hips", (0, MY, 1.18), 1.0, shorts_m, scale=(0.8, 0.55, 0.3), sub=3)
+cyl("Neck", (0, MY, 3.05), 0.2, 0.35, skin_m)
+sphere("Head", (0, MY, 3.5), 0.45, skin_m, sub=3)
+sphere("ManHairS", (0, MY + 0.06, 3.72), 0.42, hair_m, scale=(1.05, 1.0, 0.6), sub=2)
 for sx in (-1, 1):
-    hp.append(sphere("HEyeW", (HCX + sx * 0.36, HCY - 0.52, HCZ + 0.35), 0.2, eyew, scale=(0.8, 0.5, 1), sub=2))
-    hp.append(sphere("HEyeB", (HCX + sx * 0.33, HCY - 0.61, HCZ + 0.32), 0.09, eyeb, sub=2))
-hp.append(tube("HSmile", [(HCX - 0.25, HCY - 0.52, HCZ - 0.05), (HCX, HCY - 0.58, HCZ - 0.18), (HCX + 0.25, HCY - 0.52, HCZ - 0.05)],
-               [0.035] * 3, eyeb))
-hp.append(cyl("Aorta", (HCX + 0.2, HCY + 0.2, HCZ + 1.1), 0.22, 0.8, mat("AortaM", (0.95, 0.35, 0.4), 0.4)))
-hp.append(cyl("VenaC", (HCX - 0.6, HCY + 0.25, HCZ + 1.0), 0.16, 0.6, art_m))
+    sphere("MEyeW", (sx * 0.15, MY - 0.4, 3.58), 0.1, eyew, scale=(1, 0.6, 1.2), sub=2)
+    sphere("MEyeB", (sx * 0.15, MY - 0.46, 3.57), 0.05, eyeb, sub=1)
+    sphere("Ear", (sx * 0.45, MY, 3.5), 0.1, skin_m, scale=(0.5, 1, 1.2), sub=1)
+mouth = tube("MSmile", [(-0.14, MY - 0.41, 3.36), (0, MY - 0.45, 3.31), (0.14, MY - 0.41, 3.36)], [0.022] * 3, eyeb)
+sphere("Nose", (0, MY - 0.46, 3.46), 0.06, skin_m, sub=1)
+for sx in (-1, 1):
+    tube("Thigh", [(sx * 0.38, 2.0, 1.2), (sx * 0.42, 0.65, 1.2)], [0.27, 0.25], shorts_m)
+    tube("Shin", [(sx * 0.42, 0.62, 1.2), (sx * 0.42, 0.56, 0.14)], [0.21, 0.18], skin_m)
+    box("Foot", (sx * 0.42, 0.42, 0.08), (0.3, 0.5, 0.16), mat("Shoe", (0.15, 0.15, 0.18), 0.6), bevel=0.05)
+# arm on the side table (IV arm, screen-left)
+sphere("ShoulderL", (-0.8, MY, 2.8), 0.25, skin_m, sub=2)
+tube("UpperArmL", [(-0.82, MY, 2.8), (-1.05, 1.55, 1.85)], [0.22, 0.21], skin_m)
+sphere("ElbowL", (-1.07, 1.48, 1.74), 0.22, skin_m, sub=2)
+tube("ForearmL", [(-1.07, 1.43, 1.72), (-2.45, 1.4, 1.72)], [0.23, 0.19], skin_m)
+sphere("HandL", (-2.68, 1.4, 1.68), 0.2, skin_m, scale=(1.3, 1, 0.6), sub=2)
+# other arm resting on the lap
+sphere("ShoulderR", (0.8, MY, 2.8), 0.25, skin_m, sub=2)
+tube("UpperArmR", [(0.82, MY, 2.8), (0.9, 1.8, 1.75)], [0.22, 0.21], skin_m)
+tube("ForearmR", [(0.9, 1.78, 1.72), (0.62, 0.95, 1.5)], [0.21, 0.18], skin_m)
+sphere("HandR", (0.58, 0.82, 1.48), 0.17, skin_m, sub=2)
+
+# cut-away chest: dark cavity + organs in front
+cav = cyl("Cavity", (0, 1.44, 2.25), 1.0, 0.03, mat("CavM", (0.42, 0.07, 0.12), 0.6), rot=(math.radians(90), 0, 0), verts=40)
+cav.scale = (0.58, 0.74, 1)
+tube("CavRim", [(0.58 * math.cos(a / 40 * 6.283), 1.425, 2.25 + 0.74 * math.sin(a / 40 * 6.283)) for a in range(41)], [0.03] * 41,
+     mat("CavRimM", (0.85, 0.5, 0.45), 0.6))
+lung_m = mat("Lung", (0.98, 0.6, 0.66), 0.55)
+LUNGS = [(-0.3, 1.36, 2.42), (0.3, 1.36, 2.42)]
+for p in LUNGS:
+    sphere("Lobe", p, 1.0, lung_m, scale=(0.24, 0.1, 0.4), sub=3)
+trach_m = mat("Trach", (0.95, 0.86, 0.86), 0.5)
+tube("Trachea", [(0, 1.36, 2.95), (0, 1.36, 2.72)], [0.05, 0.05], trach_m)
+tube("BronL", [(0, 1.36, 2.72), (-0.22, 1.35, 2.62)], [0.04, 0.035], trach_m)
+tube("BronR", [(0, 1.36, 2.72), (0.22, 1.35, 2.62)], [0.04, 0.035], trach_m)
+HCX, HCY, HCZ = 0.04, 1.27, 2.08
+heart = group("Heart", (HCX, HCY, HCZ))
+hp = [sphere("HLobeL", (HCX - 0.085, HCY, HCZ + 0.06), 0.13, heart_m, scale=(1, 0.7, 1), sub=3),
+      sphere("HLobeR", (HCX + 0.085, HCY, HCZ + 0.06), 0.13, heart_m, scale=(1, 0.7, 1), sub=3),
+      cyl("HTip", (HCX, HCY, HCZ - 0.1), 0.01, 0.26, heart_m, r2=0.205, verts=32)]
+hp[2].scale = (1, 0.6, 1)
+for sx in (-1, 1):
+    hp.append(sphere("HEyeW", (HCX + sx * 0.06, HCY - 0.09, HCZ + 0.06), 0.035, eyew, scale=(0.8, 0.5, 1), sub=2))
+    hp.append(sphere("HEyeB", (HCX + sx * 0.055, HCY - 0.105, HCZ + 0.055), 0.016, eyeb, sub=1))
+hp.append(tube("HSmile", [(HCX - 0.045, HCY - 0.09, HCZ - 0.02), (HCX, HCY - 0.1, HCZ - 0.04), (HCX + 0.045, HCY - 0.09, HCZ - 0.02)],
+               [0.007] * 3, eyeb))
 attach(hp, heart)
 STOP0, STOP1 = S[11], S[14] + 10
 for f in range(0, FRAMES, 12):
     if STOP0 <= f < STOP1:
         continue
-    keyscale(heart, [(f, 1.0), (f + 4, 1.09), (f + 8, 1.0)])
-keyscale(heart, [(STOP0, (1.04, 1.04, 0.94)), (STOP1 - 1, (1.04, 1.04, 0.94))])
+    keyscale(heart, [(f, 1.0), (f + 4, 1.1), (f + 8, 1.0)])
+keyscale(heart, [(STOP0, (1.05, 1.05, 0.93)), (STOP1 - 1, (1.05, 1.05, 0.93))])
+tube("PulmArt", [(HCX + 0.08, HCY + 0.02, HCZ + 0.15), (0.2, 1.28, 2.32), (0.27, 1.27, 2.4)], [0.025] * 3, art_m)
 
-# ---------------- lungs + capillary net ----------------
-lung_m = mat("Lung", (0.97, 0.58, 0.64), 0.6)
-trach_m = mat("Trach", (0.95, 0.85, 0.85), 0.5)
-for lx in (LX1, LX2):
-    sphere("Lobe", (lx, LY, LZ), 1.0, lung_m, scale=(0.82, 0.62, 1.3), sub=3)
-tube("Trachea", [(6.25, LY, 4.2), (6.25, LY, 3.3), (6.25, LY, 3.0)], [0.2, 0.2, 0.2], trach_m)
-tube("BronL", [(6.25, LY, 3.0), (5.8, LY, 2.75), (LX1 + 0.2, LY, 2.4)], [0.16, 0.14, 0.12], trach_m)
-tube("BronR", [(6.25, LY, 3.0), (6.7, LY, 2.75), (LX2 - 0.2, LY, 2.4)], [0.16, 0.14, 0.12], trach_m)
-for k in range(5):
-    tube("Ring", [(6.25 + 0.21 * math.cos(a / 12 * 6.283), LY + 0.21 * math.sin(a / 12 * 6.283), 3.3 + k * 0.18) for a in range(13)],
-         [0.03] * 13, mat("RingM", (0.85, 0.72, 0.72), 0.5))
+# capillary net on the right lung
+NX, NY, NZ = 0.3, 1.255, 2.42
 net = group("Net", (NX, NY, NZ))
 cap_r = mat("CapR", (0.95, 0.15, 0.2), 0.4, emit=(0.9, 0.1, 0.15), emit_strength=0.4)
 cap_b = mat("CapB", (0.35, 0.4, 1.0), 0.4, emit=(0.3, 0.35, 0.9), emit_strength=0.4)
 np_ = []
-for i in range(8):
-    x = NX - 0.7 + i * 0.2
-    np_.append(tube("NetV", [(x, NY, NZ - 1.0), (x + 0.03, NY, NZ), (x, NY, NZ + 1.0)], [0.028] * 3, cap_r if i % 2 else cap_b))
-for j in range(11):
-    z = NZ - 1.0 + j * 0.2
-    np_.append(tube("NetH", [(NX - 0.75, NY, z), (NX, NY, z + 0.03), (NX + 0.75, NY, z)], [0.028] * 3, cap_b if j % 2 else cap_r))
+for i in range(6):
+    x = NX - 0.125 + i * 0.05
+    np_.append(tube("NetV", [(x, NY, NZ - 0.22), (x, NY, NZ + 0.22)], [0.007] * 2, cap_r if i % 2 else cap_b))
+for j in range(9):
+    z = NZ - 0.2 + j * 0.05
+    np_.append(tube("NetH", [(NX - 0.14, NY, z), (NX + 0.14, NY, z)], [0.007] * 2, cap_b if j % 2 else cap_r))
 attach(np_, net)
 hide_until(net, S[6] - 2)
 keyscale(net, [(S[6] - 2, 0.001), (S[6] + 4, 1.15), (S[6] + 8, 1.0)])
-dots = []
-for i in range(70):
-    lx = random.choice((LX1, LX2))
-    th = random.uniform(-1.1, 1.1); ph = random.uniform(-0.95, 0.95)
-    p = (lx + 0.82 * math.sin(th) * math.cos(ph), LY - 0.62 * math.cos(th) * math.cos(ph) - 0.02, LZ + 1.3 * math.sin(ph))
-    d = sphere("CapDot", p, 0.07, cap_r if i % 2 else cap_b, sub=1)
-    pop(d, S[7] + int(i * 0.35), 4, S[9] - 2)
+for i in range(60):
+    lp = random.choice(LUNGS)
+    th = random.uniform(-1.1, 1.1); ph = random.uniform(-1.0, 1.0)
+    p = (lp[0] + 0.24 * math.sin(th) * math.cos(ph), lp[1] - 0.1 * math.cos(th) * math.cos(ph) - 0.005, lp[2] + 0.4 * math.sin(ph))
+    d = sphere("CapDot", p, 0.016, cap_r if i % 2 else cap_b, sub=1)
+    pop(d, S[7] + int(i * 0.4), 4, S[9] - 2)
+
+# ---------------- forearm vein (cut-away, raised on the skin) + blue vein up the arm ----------------
+VY, VZ, VR = 1.33, 1.99, 0.11
+VX0, VX1 = -2.4, -1.2
+half_pipe("ArmVein", VX0, VX1, VY, VZ, VR, vein_m, thick=0.018)
+bpy.ops.mesh.primitive_torus_add(major_radius=0.026, minor_radius=0.014, major_segments=14, minor_segments=6)
+RBC = bpy.context.object.data; sc.collection.objects.unlink(bpy.context.object)
+RBC.materials.append(cell_m)
+L = VX1 - VX0
+for i in range(22):
+    o = bpy.data.objects.new("Cell", RBC); sc.collection.objects.link(o)
+    ph = random.uniform(0, L)
+    cy = VY + random.uniform(-0.45, 0.45) * VR
+    cz = VZ - VR + 0.035 + random.uniform(0, 0.4) * VR
+    rx, ry = random.uniform(0, 3), random.uniform(0, 3)
+    for f in range(0, FRAMES + 2, 2):
+        x = VX0 + (ph + 0.012 * f) % L
+        vis = VX0 + 0.05 < x < VX1 - 0.05
+        o.location = (x, cy + 0.01 * math.sin(f * 0.2 + i), cz)
+        o.rotation_euler = (rx + f * 0.05, ry, 0)
+        o.scale = (1.0 if vis else 0.001,) * 3
+        o.keyframe_insert("location", frame=f); o.keyframe_insert("scale", frame=f); o.keyframe_insert("rotation_euler", frame=f)
+glowv = mat("GlowVein", (0.25, 0.4, 1.0), 0.3, emit=(0.25, 0.45, 1.0), emit_strength=1.4)
+UP = [(VX1, VY, VZ - 0.02), (-1.08, 1.3, 2.0), (-1.0, 1.42, 2.3), (-0.93, 1.6, 2.62), (-0.76, 1.68, 2.9),
+      (-0.45, 1.5, 2.72), (-0.2, 1.36, 2.42), (HCX - 0.06, HCY - 0.06, HCZ + 0.08)]
+tube("ArmVeinUp", UP, [0.028] * len(UP), glowv)
+def path_at(P, u):
+    u = max(0.0, min(1.0, u)) * (len(P) - 1)
+    i = min(int(u), len(P) - 2); t = u - i
+    a, b = P[i], P[i + 1]
+    return tuple(a[k] + (b[k] - a[k]) * t for k in range(3))
+def ride(o, P, f0, f1, n=8, lift=0.0):
+    for k in range(n + 1):
+        p = path_at(P, k / n)
+        o.location = (p[0], p[1] - lift, p[2] + lift); o.keyframe_insert("location", frame=f0 + (f1 - f0) * k / n)
 
 # ---------------- IV stand, bag, line, pump ----------------
+IVX, IVY = -2.75, 0.75
 pole_m = mat("Pole", (0.75, 0.77, 0.8), 0.3, metal=0.7)
-cyl("IVPole", (IVX, IVY, 2.3), 0.05, 4.6, pole_m, verts=12)
+cyl("IVPole", (IVX, IVY, 1.95), 0.035, 3.9, pole_m, verts=12)
 for a in range(5):
     t = a / 5 * 6.283
-    tube("IVFoot", [(IVX, IVY, 0.15), (IVX + 0.55 * math.cos(t), IVY + 0.55 * math.sin(t), 0.05)], [0.035, 0.03], pole_m)
-box("IVHook", (IVX, IVY - 0.12, 4.55), (0.5, 0.05, 0.05), pole_m)
+    tube("IVFoot", [(IVX, IVY, 0.12), (IVX + 0.45 * math.cos(t), IVY + 0.45 * math.sin(t), 0.04)], [0.03, 0.025], pole_m)
+box("IVHook", (IVX, IVY - 0.08, 3.85), (0.4, 0.04, 0.04), pole_m)
 bag_m = mat("Bag", (0.75, 0.9, 1.0), 0.1, emit=(0.6, 0.8, 1.0), emit_strength=0.25)
-box("IVBag", (IVX, IVY - 0.2, 4.0), (0.85, 0.22, 1.05), bag_m, bevel=0.1)
-box("IVLabel", (IVX, IVY - 0.33, 4.05), (0.5, 0.02, 0.4), white_lab)
-cyl("Drip", (IVX, IVY - 0.2, 3.25), 0.09, 0.35, bag_m)
-line_m = mat("Line", (0.85, 0.95, 1.0), 0.15, emit=(0.7, 0.85, 1.0), emit_strength=0.2)
-LINE = [(IVX, IVY - 0.2, 3.07), (IVX + 0.05, IVY - 0.35, 2.4), (IVX + 0.25, IVY - 0.45, 1.6), (IVX + 0.5, VY, 1.05), (IVX + 0.6, VY, 0.5)]
-tube("IVLine", LINE, [0.06] * 5, line_m)
+box("IVBag", (IVX, IVY - 0.14, 3.4), (0.6, 0.16, 0.75), bag_m, bevel=0.07)
+box("IVLabel", (IVX, IVY - 0.23, 3.45), (0.36, 0.02, 0.28), white_lab)
+cyl("Drip", (IVX, IVY - 0.14, 2.88), 0.06, 0.24, bag_m)
+line_m = mat("Line", (0.85, 0.95, 1.0), 0.15, emit=(0.7, 0.85, 1.0), emit_strength=0.25)
+LINE = [(IVX, IVY - 0.14, 2.76), (IVX + 0.05, IVY - 0.25, 2.35), (IVX + 0.2, 1.0, 2.1), (-2.42, 1.25, 2.04), (VX0 + 0.05, VY, VZ - 0.03)]
+tube("IVLine", LINE, [0.025] * 5, line_m)
+box("Tape", (-2.36, 1.33, 1.93), (0.18, 0.2, 0.03), mat("TapeM", (0.97, 0.95, 0.9), 0.7))
 def line_at(u):
-    u = max(0.0, min(1.0, u)) * (len(LINE) - 1)
-    i = min(int(u), len(LINE) - 2); t = u - i
-    a, b = LINE[i], LINE[i + 1]
-    return tuple(a[k] + (b[k] - a[k]) * t for k in range(3))
-pump_m = mat("Pump", (0.95, 0.95, 0.97), 0.4)
-PZ_ = 2.5
-PUX = IVX - 0.48
-box("Pump", (PUX, IVY - 0.1, PZ_), (0.75, 0.42, 0.6), pump_m, bevel=0.05)
-scr = box("PumpScr", (PUX, IVY - 0.32, PZ_ + 0.05), (0.55, 0.02, 0.32), mat("PumpScrM", (0.1, 0.25, 0.2), 0.3, emit=(0.2, 0.7, 0.4), emit_strength=0.6))
-air_txt = text("AirTxt", "AIR!", (PUX, IVY - 0.345, PZ_ + 0.05), 0.22, red_lab, extrude=0.01)
+    return path_at(LINE, u)
+PZ_ = 1.95
+PUX = IVX - 0.36
+box("Pump", (PUX, IVY, PZ_), (0.52, 0.3, 0.42), mat("Pump", (0.95, 0.95, 0.97), 0.4), bevel=0.04)
+box("PumpScr", (PUX, IVY - 0.155, PZ_ + 0.03), (0.38, 0.02, 0.22), mat("PumpScrM", (0.1, 0.25, 0.2), 0.3, emit=(0.2, 0.7, 0.4), emit_strength=0.6))
+air_txt = text("AirTxt", "AIR!", (PUX, IVY - 0.172, PZ_ + 0.03), 0.15, red_lab, extrude=0.01)
 pop(air_txt, S[13] + 2, 4, S[14])
 siren_m = mat("Siren", (0.9, 0.1, 0.05), 0.3, emit=(1.0, 0.1, 0.05), emit_strength=0.0)
-siren = sphere("Siren", (PUX, IVY - 0.1, PZ_ + 0.42), 0.16, siren_m, scale=(1, 1, 0.8), sub=2)
+sphere("Siren", (PUX, IVY, PZ_ + 0.3), 0.11, siren_m, scale=(1, 1, 0.8), sub=2)
 em = siren_m.node_tree.nodes["Principled BSDF"].inputs["Emission Strength"]
 em.default_value = 0.0; em.keyframe_insert("default_value", frame=0)
 for (a, b) in [(S[9], S[10]), (S[13], S[14])]:
@@ -549,139 +584,140 @@ for (a, b) in [(S[9], S[10]), (S[13], S[14])]:
     em.default_value = 0.0; em.keyframe_insert("default_value", frame=b)
 ring_m = glow_mat("AlarmRing", (1.0, 0.25, 0.15), 3.0)
 for k in range(3):
-    rr = tube("AlarmRing", [(0.3 * math.cos(a / 24 * 6.283), 0, 0.3 * math.sin(a / 24 * 6.283)) for a in range(25)], [0.02] * 25, ring_m)
-    rr.location = (PUX, IVY - 0.4, PZ_ + 0.05)
+    rr = tube("AlarmRing", [(0.22 * math.cos(a / 24 * 6.283), 0, 0.22 * math.sin(a / 24 * 6.283)) for a in range(25)], [0.015] * 25, ring_m)
+    rr.location = (PUX, IVY - 0.25, PZ_ + 0.03)
     f0 = S[13] + 4 + k * 7
     keyscale(rr, [(0, 0.001), (f0 - 1, 0.001), (f0, 1.0), (f0 + 12, 2.2), (f0 + 13, 0.001)])
 
 # ---------------- the hero bubble ----------------
-B = bubble("Bubble", (0, 0, 0), 0.2)
-in_x = IVX + 0.6
-bkeys = [(0, line_at(0.0)), (S[1] - 6, line_at(1.0)), (S[1], (in_x + 0.5, VY, VZ - 0.15)),
-         (S[2], (in_x + 0.9, VY, VZ - 0.12)), (S[3], (in_x + 1.0, VY, VZ - 0.15)),
-         (S[4], (in_x + 1.2, VY, VZ - 0.15)), (S[5] - 2, (VX1 - 0.1, VY, VZ - 0.1)),
-         (S[5] + 2, (AX0 + 0.1, AY, AZ - 0.15)), (S[6] - 4, (AX1 - 0.1, AY, AZ - 0.12)), (S[6] + 6, (NX, NY - 0.12, NZ - 0.05)),
-         (S[8], (NX + 0.02, NY - 0.12, NZ - 0.02))]
-key_loc(B, bkeys)
+B = bubble("Bubble", (0, 0, 0), 0.05)
+ride(B, LINE, 0, S[1] - 6, 8)
+key_loc(B, [(S[1], (VX0 + 0.25, VY, VZ - 0.04)), (S[2], (VX0 + 0.35, VY, VZ - 0.04)), (S[4], (VX0 + 0.45, VY, VZ - 0.04)),
+            (S[4] + 14, (VX1 - 0.02, VY, VZ - 0.03))])
+ride(B, UP, S[4] + 16, S[5] - 1, 10, lift=0.03)
+key_loc(B, [(S[5] + 6, (HCX + 0.09, HCY - 0.06, HCZ + 0.15)), (S[6] - 4, (0.26, 1.24, 2.38)), (S[6] + 6, (NX, NY - 0.04, NZ + 0.02)),
+            (S[8], (NX + 0.005, NY - 0.04, NZ + 0.025))])
 keyscale(B, [(0, 1.0), (S[6] + 8, 1.0), (S[7] + 2, (1.15, 1.0, 0.85)), (S[7] + 6, 1.0), (S[7] + 10, (1.1, 1.0, 0.9)), (S[8], 1.0),
              (S[9] - 6, 0.001)])
-sparks = []
 spark_m = glow_mat("Spark", (0.8, 0.95, 1.0), 4.0)
-for i in range(16):
-    p0 = (NX + random.uniform(-0.2, 0.2), NY - 0.15, NZ + random.uniform(-0.1, 0.2))
-    p1 = (6.25 + random.uniform(-0.6, 0.6), LY - 0.4, 4.3 + random.uniform(0, 1.6))
-    sp_ = sphere("Spark", p0, 0.06, spark_m, sub=1)
-    f0 = S[8] + 4 + i
-    key_loc(sp_, [(f0, p0), (f0 + 18, p1)])
+for i in range(14):
+    p0 = (NX + random.uniform(-0.05, 0.05), NY - 0.06, NZ + random.uniform(-0.03, 0.05))
+    p1 = (random.uniform(-0.15, 0.15), MY - 0.55, 3.35 + random.uniform(0, 0.5))
+    sp_ = sphere("Spark", p0, 0.015, spark_m, sub=1)
+    f0 = S[8] + 2 + i
+    key_loc(sp_, [(f0, p0), (f0 + 10, (0.0, 1.3, 2.9)), (f0 + 18, p1)])
     pop(sp_, f0, 3, min(f0 + 20, S[9] + 2))
+ahh = text("Ahh", "phew", (0.0, MY - 0.7, 4.15), 0.2, white_lab, extrude=0.01)
+pop(ahh, S[8] + 18, 4, S[9] + 2)
 
 # ---------------- line 1-2: movie clapperboard + MYTH stamp + green check ----------------
-CBX, CBY, CBZ = -4.3, 2.1, 1.75
+CBX, CBY, CBZ = 1.9, 0.45, 1.45
 clap = group("Clap", (CBX, CBY, CBZ))
-cb = [box("ClapBoard", (CBX, CBY, CBZ), (1.7, 0.1, 1.15), mat("ClapM", (0.08, 0.08, 0.1), 0.5), bevel=0.03),
-      box("ClapPost", (CBX, CBY + 0.1, CBZ / 2 - 0.3), (0.12, 0.08, CBZ - 0.6), mat("ClapP", (0.4, 0.4, 0.42), 0.5)),
-      text("ClapTxt", "MOVIES", (CBX, CBY - 0.06, CBZ - 0.12), 0.38, white_lab, extrude=0.01)]
-bar = stripe_mat("ClapBar", (0.97, 0.97, 0.97), (0.08, 0.08, 0.1), axis="X", freq=9.0, thresh=0.0)
-cb.append(box("ClapTop", (CBX, CBY, CBZ + 0.68), (1.7, 0.12, 0.2), bar))
+cb = [box("ClapBoard", (CBX, CBY, CBZ), (1.2, 0.08, 0.8), mat("ClapM", (0.08, 0.08, 0.1), 0.5), bevel=0.02),
+      box("ClapPost", (CBX, CBY + 0.08, CBZ / 2 - 0.2), (0.09, 0.06, CBZ - 0.4), mat("ClapP", (0.4, 0.4, 0.42), 0.5)),
+      text("ClapTxt", "MOVIES", (CBX, CBY - 0.05, CBZ - 0.08), 0.27, white_lab, extrude=0.01)]
+bar = stripe_mat("ClapBar", (0.97, 0.97, 0.97), (0.08, 0.08, 0.1), axis="X", freq=12.0, thresh=0.0)
+cb.append(box("ClapTop", (CBX, CBY, CBZ + 0.48), (1.2, 0.09, 0.14), bar))
 attach(cb, clap)
 pop(clap, S[1] - 2, 6)
-myth = text("Myth", "MYTH", (CBX, CBY - 0.25, CBZ + 0.05), 0.62, red_lab, extrude=0.06)
+myth = text("Myth", "MYTH", (CBX, CBY - 0.18, CBZ + 0.03), 0.44, red_lab, extrude=0.04)
 myth.rotation_euler = (math.radians(90), math.radians(-14), 0)
 pop(myth, S[2] + 1, 5, S[3] + 2)
-myth2 = text("Myth2", "MYTH?", (CBX, CBY - 0.25, CBZ + 0.05), 0.55, red_lab, extrude=0.06)
+myth2 = text("Myth2", "MYTH?", (CBX, CBY - 0.18, CBZ + 0.03), 0.38, red_lab, extrude=0.04)
 myth2.rotation_euler = (math.radians(90), math.radians(-10), 0)
 pop(myth2, S[17] + 6, 5)
-chk = group("Check", (in_x + 0.9, VY - 0.3, 1.75))
-ck = [box("Chk1", (in_x + 0.75, VY - 0.3, 1.65), (0.1, 0.1, 0.35), green_lab, rot=(0, math.radians(-40), 0)),
-      box("Chk2", (in_x + 1.0, VY - 0.3, 1.78), (0.1, 0.1, 0.65), green_lab, rot=(0, math.radians(35), 0))]
+chk = group("Check", (VX0 + 0.45, VY - 0.15, 2.3))
+ck = [box("Chk1", (VX0 + 0.4, VY - 0.15, 2.26), (0.04, 0.04, 0.13), green_lab, rot=(0, math.radians(-40), 0)),
+      box("Chk2", (VX0 + 0.5, VY - 0.15, 2.31), (0.04, 0.04, 0.25), green_lab, rot=(0, math.radians(35), 0))]
 attach(ck, chk)
 pop(chk, S[2] + 6, 5, S[3] + 2)
 
 # ---------------- line 3: a few tiny bubbles sneak down the IV line ----------------
 for k in range(4):
-    tb = bubble("Tiny", (0, 0, 0), 0.09)
+    tb = bubble("Tiny", (0, 0, 0), 0.025)
     f0 = S[3] + 2 + k * 6
-    key_loc(tb, [(f0, line_at(0.0)), (f0 + 14, line_at(1.0)), (f0 + 20, (in_x + 0.4 + 0.3 * k, VY - 0.1, VZ - 0.2)),
-                 (S[5], (in_x + 2.5 + 0.3 * k, VY - 0.1, VZ - 0.2))])
+    ride(tb, LINE, f0, f0 + 14, 6)
+    key_loc(tb, [(f0 + 20, (VX0 + 0.15 + 0.08 * k, VY - 0.02, VZ - 0.06)), (S[5], (VX0 + 0.7 + 0.08 * k, VY - 0.02, VZ - 0.06))])
     keyscale(tb, [(0, 0.001), (f0 - 1, 0.001), (f0, 1.0), (S[5] - 4, 1.0), (S[5], 0.001)])
 
 # ---------------- line 9: a big rush of air ----------------
-for k in range(16):
-    r = random.uniform(0.2, 0.36)
+for k in range(14):
+    r = random.uniform(0.04, 0.07)
     bb = bubble("Rush", (0, 0, 0), r)
-    p0 = (VX0 + 0.5 + random.uniform(-0.3, 0.3), VY + random.uniform(-0.2, 0.2), VZ - VR + r + 0.12 + random.uniform(0, 0.15))
-    f0 = S[9] - 4 + k * 2
-    p1 = (VX1 - 0.4, p0[1], p0[2])
-    key_loc(bb, [(f0, p0), (S[10] + 2 + k, p1)])
-    keyscale(bb, [(0, 0.001), (f0 - 1, 0.001), (f0 + 2, 1.0), (S[10] + 2 + k, 1.0), (S[10] + 5 + k, 0.001)])
-for k in range(8):   # air pouring in from the line
-    bb = bubble("RushIV", (0, 0, 0), 0.14)
-    f0 = S[9] + k * 3
-    key_loc(bb, [(f0, line_at(0.0)), (f0 + 10, line_at(1.0)), (S[10] + 6, (VX1 - 0.4, VY, VZ - 0.25))])
-    keyscale(bb, [(0, 0.001), (f0 - 1, 0.001), (f0, 1.0), (S[10] + 4, 1.0), (S[10] + 7, 0.001)])
+    f0 = S[9] - 2 + k * 2
+    ride(bb, LINE, f0, f0 + 8, 4)
+    key_loc(bb, [(f0 + 14, (VX0 + 0.3 + random.uniform(0, 0.2), VY + random.uniform(-0.04, 0.04), VZ - VR + r + 0.02)),
+                 (S[10] - 6 + k, (VX1 - 0.05, VY, VZ - 0.03))])
+    ride(bb, UP, S[10] - 4 + k, S[10] + 8 + k, 6, lift=0.03)
+    keyscale(bb, [(0, 0.001), (f0 - 1, 0.001), (f0 + 2, 1.0), (S[10] + 8 + k, 1.0), (S[10] + 10 + k, 0.001)])
 
-# ---------------- line 10: foam inside the heart (shown on its front), shrinks with oxygen (line 14) ----------------
+# ---------------- line 10: foam in the heart; shrinks with oxygen (line 14) ----------------
 foam_m = mat("Foam", (0.97, 0.99, 1.0), 0.08, emit=(0.8, 0.9, 1.0), emit_strength=0.35)
-foam = []
-for i in range(46):
+for i in range(40):
     a = random.uniform(0, 6.283); rr = math.sqrt(random.uniform(0, 1))
-    p = (HCX + 0.85 * rr * math.cos(a), HCY - 0.62 - random.uniform(0, 0.12), HCZ + 0.15 + 0.7 * rr * math.sin(a))
-    fo = sphere("Foam", p, random.uniform(0.09, 0.22), foam_m, sub=2)
+    p = (HCX + 0.17 * rr * math.cos(a), HCY - 0.1 - random.uniform(0, 0.02), HCZ + 0.01 + 0.13 * rr * math.sin(a))
+    fo = sphere("Foam", p, random.uniform(0.02, 0.045), foam_m, sub=2)
     f0 = S[10] + int(i * 0.5)
-    keyscale(fo, [(0, 0.001), (f0 - 1, 0.001), (f0 + 3, 1.2), (f0 + 5, 1.0), (S[14] + 4, 1.0), (S[14] + 26 + i % 10, 0.001)])
-    foam.append(fo)
-stop = group("Stop", (HCX, HCY - 0.3, 3.65))
-st = [cyl("StopSign", (HCX, HCY - 0.3, 3.65), 0.68, 0.06, red_lab, rot=(math.radians(90), math.radians(22.5), 0), verts=8),
-      text("StopTxt", "STOP", (HCX, HCY - 0.37, 3.65), 0.36, white_lab, extrude=0.01)]
+    keyscale(fo, [(0, 0.001), (f0 - 1, 0.001), (f0 + 3, 1.2), (f0 + 5, 1.0), (S[14] + 8, 1.0), (S[14] + 30 + i % 10, 0.001)])
+stop = group("Stop", (0.0, 1.0, 4.35))
+st = [cyl("StopSign", (0.0, 1.0, 4.35), 0.42, 0.04, red_lab, rot=(math.radians(90), math.radians(22.5), 0), verts=8),
+      text("StopTxt", "STOP", (0.0, 0.97, 4.35), 0.22, white_lab, extrude=0.01)]
 attach(st, stop)
 pop(stop, S[11] + 1, 5, S[12] + 2)
-lock = text("Jam", "JAMMED", (HCX, HCY - 0.9, 0.35), 0.38, lab_m, extrude=0.04)
+lock = text("Jam", "JAMMED", (0.0, 1.0, 1.55), 0.26, lab_m, extrude=0.03)
 pop(lock, S[11] + 6, 5, S[12] + 2)
+# the man looks worried while the heart is jammed (mouth turns down)
+mouth.keyframe_insert("rotation_euler", frame=S[9])
+mouth.rotation_euler = (0, math.radians(180), 0)
+mouth.location = (0, 0, 2 * 3.34)
+mouth.keyframe_insert("rotation_euler", frame=S[9] + 2); mouth.keyframe_insert("location", frame=S[9] + 2)
+mouth.keyframe_insert("rotation_euler", frame=S[14] + 20); mouth.keyframe_insert("location", frame=S[14] + 20)
+mouth.rotation_euler = (0, 0, 0); mouth.location = (0, 0, 0)
+mouth.keyframe_insert("rotation_euler", frame=S[14] + 22); mouth.keyframe_insert("location", frame=S[14] + 22)
+mouth.location = (0, 0, 0); mouth.keyframe_insert("location", frame=S[9])
 
-# ---------------- line 12: the nurse flicks a bubble out of the line ----------------
-nurse = person("Nurse", (IVX - 0.9, IVY - 0.75, 0), (0.15, 0.7, 0.68), hair=(0.12, 0.08, 0.05), arm_up=True,
+# ---------------- line 12: nurse flicks a bubble out of the line ----------------
+nurse = person("Nurse", (IVX - 0.75, IVY - 0.55, 0), (0.15, 0.7, 0.68), hair=(0.12, 0.08, 0.05), arm_up=True,
                extra=lambda x, y: [box("Cap", (x, y + 0.02, 1.93), (0.36, 0.3, 0.12), mat("CapM", (0.15, 0.7, 0.68), 0.6))])
+nurse.scale = (1.15, 1.15, 1.15)
 hide_until(nurse, S[12] - 3)
-keyscale(nurse, [(S[12] - 3, 0.001), (S[12] + 2, 1.0)])
-for f, a in [(S[12] + 4, 0.0), (S[12] + 8, -0.25), (S[12] + 10, 0.1), (S[12] + 14, -0.25), (S[12] + 16, 0.1), (S[12] + 20, 0.0)]:
+keyscale(nurse, [(S[12] - 3, 0.001), (S[12] + 2, 1.15), (S[13] - 2, 1.15), (S[13] + 2, 0.001)])
+for f, a in [(S[12] + 4, 0.0), (S[12] + 8, -0.2), (S[12] + 10, 0.08), (S[12] + 14, -0.2), (S[12] + 16, 0.08), (S[12] + 20, 0.0)]:
     nurse.rotation_euler = (0, a, 0); nurse.keyframe_insert("rotation_euler", frame=f)
-gone_at(nurse, S[14] - 1, 3)
-fb = bubble("FlickB", (0, 0, 0), 0.13)
-key_loc(fb, [(S[12], line_at(0.45)), (S[12] + 10, line_at(0.45)), (S[12] + 22, line_at(0.0)), (S[12] + 34, (IVX, IVY - 0.6, 4.8))])
-keyscale(fb, [(0, 0.001), (S[12] - 1, 0.001), (S[12], 1.0), (S[12] + 34, 1.3), (S[12] + 37, 0.001)])
-flick = text("Flick", "FLICK!", (IVX + 0.8, IVY - 0.6, 2.3), 0.3, lab_m, extrude=0.03)
+fb = bubble("FlickB", (0, 0, 0), 0.05)
+key_loc(fb, [(S[12], line_at(0.3)), (S[12] + 10, line_at(0.3)), (S[12] + 20, line_at(0.0)), (S[12] + 32, (IVX, IVY - 0.4, 4.0))])
+keyscale(fb, [(0, 0.001), (S[12] - 1, 0.001), (S[12], 1.0), (S[12] + 32, 1.4), (S[12] + 35, 0.001)])
+flick = text("Flick", "FLICK!", (IVX + 0.6, IVY - 0.45, 2.75), 0.22, lab_m, extrude=0.02)
 pop(flick, S[12] + 8, 4, S[13])
 for k in range(8):
     a = k / 8 * 6.283
-    s_ = sphere("PopSpark", (IVX + 0.45 * math.cos(a), IVY - 0.6, 4.8 + 0.45 * math.sin(a)), 0.05, spark_m, sub=1)
-    pop(s_, S[12] + 35, 3, S[13] + 4)
+    s_ = sphere("PopSpark", (IVX + 0.25 * math.cos(a), IVY - 0.4, 4.0 + 0.25 * math.sin(a)), 0.03, spark_m, sub=1)
+    pop(s_, S[12] + 33, 3, S[13] + 4)
 
-# ---------------- line 14: oxygen tank ----------------
-OX, OY = 2.7, -0.55
+# ---------------- line 14: oxygen mask + tank ----------------
+OX, OY = 1.45, 1.2
 o2_m = mat("O2", (0.12, 0.62, 0.3), 0.35)
-cyl("O2Tank", (OX, OY, 0.85), 0.34, 1.7, o2_m)
-sphere("O2Top", (OX, OY, 1.7), 0.34, o2_m, scale=(1, 1, 0.6))
-cyl("O2Valve", (OX, OY, 2.0), 0.08, 0.25, pole_m)
-o2t = text("O2Txt", "O2", (OX, OY - 0.35, 1.0), 0.36, white_lab, extrude=0.01)
-HOSE = [(OX, OY, 2.1), (OX - 0.3, OY - 0.2, 2.5), (OX - 1.1, OY - 0.1, 2.3), (HCX + 0.3, HCY - 0.85, 1.8)]
-tube("O2Hose", HOSE, [0.05] * 4, mat("HoseM", (0.85, 0.95, 0.9), 0.3))
+cyl("O2Tank", (OX, OY, 0.75), 0.26, 1.5, o2_m)
+sphere("O2Top", (OX, OY, 1.5), 0.26, o2_m, scale=(1, 1, 0.6))
+cyl("O2Valve", (OX, OY, 1.72), 0.06, 0.2, pole_m)
+text("O2Txt", "O2", (OX, OY - 0.27, 0.85), 0.26, white_lab, extrude=0.01)
+mask = sphere("Mask", (0, MY - 0.43, 3.33), 0.16, mat("MaskM", (0.85, 0.95, 1.0), 0.15, emit=(0.6, 0.85, 1.0), emit_strength=0.3), scale=(1, 0.6, 0.9), sub=2)
+HOSE = [(OX, OY, 1.82), (OX - 0.1, OY - 0.3, 2.4), (0.7, 1.2, 2.9), (0.2, MY - 0.55, 3.25), (0.0, MY - 0.5, 3.3)]
+hose = tube("O2Hose", HOSE, [0.03] * 5, mat("HoseM", (0.85, 0.95, 0.9), 0.3))
+for o in (mask, hose):
+    hide_until(o, S[14] - 2)
 o2dot = glow_mat("O2Dot", (0.4, 0.8, 1.0), 3.0)
-def hose_at(u):
-    u = max(0.0, min(1.0, u)) * (len(HOSE) - 1)
-    i = min(int(u), len(HOSE) - 2); t = u - i
-    a, b = HOSE[i], HOSE[i + 1]
-    return tuple(a[k] + (b[k] - a[k]) * t for k in range(3))
-for k in range(18):
-    d = sphere("O2D", hose_at(0), 0.08, o2dot, sub=1)
+DOWN = HOSE + [(0.0, 1.3, 2.95), (HCX, HCY - 0.08, HCZ + 0.1)]
+for k in range(16):
+    d = sphere("O2D", HOSE[0], 0.025, o2dot, sub=1)
     f0 = S[14] + k * 2
-    key_loc(d, [(f0, hose_at(0)), (f0 + 6, hose_at(0.4)), (f0 + 12, hose_at(1.0)),
-                (f0 + 16, (HCX + random.uniform(-0.7, 0.7), HCY - 0.8, HCZ + random.uniform(-0.3, 0.6)))])
-    keyscale(d, [(0, 0.001), (f0 - 1, 0.001), (f0, 1.0), (f0 + 16, 1.0), (f0 + 18, 0.001)])
-pct = text("O2Pct", "100% O2", (OX, OY - 0.4, 2.8), 0.34, lab_m, extrude=0.03)
+    ride(d, DOWN, f0, f0 + 18, 6)
+    keyscale(d, [(0, 0.001), (f0 - 1, 0.001), (f0, 1.0), (f0 + 18, 1.0), (f0 + 20, 0.001)])
+pct = text("O2Pct", "100% O2", (0.35, 0.9, 4.12), 0.2, lab_m, extrude=0.02)
 pop(pct, S[14] + 4, 5, S[15])
 
-# ---------------- line 15: pressure chamber ----------------
-CX, CY, CZ, CL, CR = -2.6, 5.0, 1.05, 3.4, 0.9
+# ---------------- line 15: pressure chamber (back of the garden) ----------------
+CX, CY, CZ, CL, CR = 3.8, 5.6, 1.05, 3.4, 0.9
 ch_m = mat("Chamber", (0.92, 0.94, 0.97), 0.75)
 cyl("Chamber", (CX, CY, CZ), CR, CL, ch_m, rot=(0, math.radians(90), 0), verts=32)
 sphere("ChEndR", (CX + CL / 2, CY, CZ), CR, ch_m, scale=(0.45, 1, 1), sub=3)
@@ -730,8 +766,8 @@ for k in range(40):
 bends = text("Bends", "THE BENDS", (DX, DY - 0.6, 2.75), 0.3, lab_m, extrude=0.03)
 pop(bends, S[16] + 22, 5, S[17] + 2)
 
-# ---------------- line 17: big question mark ----------------
-q = text("Q", "?", (HCX, HCY - 0.4, 3.9), 1.5, lab_m, extrude=0.12)
+# ---------------- line 17: big question mark over his head ----------------
+q = text("Q", "?", (0.0, MY - 0.2, 4.55), 0.9, lab_m, extrude=0.08)
 pop(q, S[17] + 2, 6)
 q.rotation_euler = (math.radians(90), 0, 0); q.keyframe_insert("rotation_euler", frame=S[17] + 2)
 q.rotation_euler = (math.radians(90), 0, math.radians(360)); q.keyframe_insert("rotation_euler", frame=FRAMES)
@@ -750,42 +786,42 @@ tr = cam.constraints.new('TRACK_TO'); tr.target = target
 tr.track_axis = 'TRACK_NEGATIVE_Z'; tr.up_axis = 'UP_Y'
 
 cam_keys = [
-    (0,          (-4.6, -3.0, 4.6),   (IVX, IVY, 3.4)),          # hook: a bubble slides down the IV line
-    (S[1] - 6,   (-4.4, -3.4, 3.2),   (in_x, VY, 1.0)),
-    (S[1] + 4,   (-3.0, -3.6, 3.6),   (CBX - 0.4, 1.2, 1.3)),    # movies say...
-    (S[2] - 2,   (-4.4, -3.4, 3.4),   (CBX - 0.6, 1.2, 1.3)),
-    (S[2] + 6,   (-4.0, -2.8, 2.9),   (in_x + 0.6, 0.8, 1.2)),   # MYTH + check
-    (S[3] - 2,   (-5.0, -2.8, 2.9),   (in_x + 0.4, 0.8, 1.2)),
-    (S[3] + 6,   (-4.8, -3.6, 3.6),   (IVX + 0.2, IVY, 2.0)),    # tiny bubbles down the line
-    (S[4] - 2,   (-6.6, -3.6, 3.2),   (IVX + 0.5, IVY, 1.5)),
-    (S[4] + 4,   (-3.8, -3.0, 2.6),   (-3.6, VY, 0.8)),          # ride along the vein
-    (S[5] - 2,   (-0.6, -3.4, 3.0),   (0.0, VY, 1.2)),
-    (S[5] + 4,   (0.9, -4.4, 3.6),    (1.6, 0.6, 1.5)),          # heart pumps it to the lungs
-    (S[6] - 2,   (3.2, -4.2, 3.4),    (3.6, 0.7, 1.5)),
-    (S[6] + 4,   (6.6, -4.6, 4.0),    (6.1, 1.0, 2.0)),          # lungs = filter
-    (S[7] - 2,   (5.4, -4.0, 3.6),    (5.8, 1.0, 1.9)),
-    (S[7] + 4,   (4.9, -2.3, 2.6),    (NX, NY, NZ)),             # trapped in the net
-    (S[8] - 2,   (5.9, -2.2, 2.5),    (NX, NY, NZ)),
-    (S[8] + 4,   (5.0, -2.8, 3.2),    (NX + 0.2, NY, NZ + 0.6)), # dissolves
-    (S[9] - 2,   (6.4, -3.8, 4.4),    (6.0, 1.0, 3.0)),
-    (S[9] + 4,   (-6.4, -5.4, 4.0),   (-4.6, VY, 1.0)),          # big rush of air
-    (S[10] - 2,  (-2.6, -5.0, 3.8),   (-1.6, VY, 1.0)),
-    (S[10] + 4,  (0.2, -3.3, 2.7),    (HCX, HCY, HCZ)),          # foam in the heart
-    (S[11] - 2,  (1.2, -3.1, 2.6),    (HCX, HCY, HCZ)),
-    (S[11] + 4,  (1.0, -4.2, 3.6),    (HCX, HCY, 2.2)),          # air lock, STOP
-    (S[12] - 2,  (0.0, -4.5, 3.8),    (HCX, HCY, 2.2)),
-    (S[12] + 4,  (-5.6, -3.6, 3.0),   (IVX - 0.3, IVY - 0.4, 2.2)),   # nurse flicks
-    (S[13] - 2,  (-7.4, -3.4, 3.4),   (IVX - 0.2, IVY - 0.4, 3.0)),
-    (S[13] + 4,  (-5.6, -2.6, 3.0),   (PUX, IVY, PZ_)),          # IV pump alarm
-    (S[14] - 2,  (-7.3, -2.5, 3.1),   (PUX, IVY, PZ_)),
-    (S[14] + 4,  (3.4, -3.9, 3.2),    (1.6, 0.0, 1.6)),          # oxygen
-    (S[15] - 2,  (0.6, -4.1, 3.3),    (1.4, 0.0, 1.6)),
-    (S[15] + 4,  (-1.2, -0.6, 3.4),   (CX - 0.6, CY, CZ)),       # pressure chamber
-    (S[16] - 2,  (-3.8, -0.4, 3.4),   (CX, CY, CZ)),
-    (S[16] + 4,  (-5.3, 4.5, 2.2),    (DX, DY, 1.7)),            # diver, the bends
-    (S[17] - 2,  (-6.7, 4.6, 2.2),    (DX, DY, 1.6)),
-    (S[17] + 6,  (-0.5, -6.2, 5.0),   (-0.8, 1.0, 2.0)),         # final: myth?
-    (FRAMES - 1, (1.5, -8.0, 6.2),    (-0.5, 1.0, 2.2)),
+    (0,          (1.0, -3.4, 4.0),    (-0.8, 1.4, 2.4)),           # hook: man in his chair, IV in his arm
+    (S[1] - 6,   (-1.6, -1.3, 3.0),   (-2.3, 1.1, 2.15)),          # bubble slides down the line
+    (S[1] + 4,   (1.6, -1.6, 2.3),    (1.7, 0.6, 1.55)),           # movies say...
+    (S[2] - 2,   (0.9, -1.5, 2.4),    (1.4, 0.6, 1.6)),
+    (S[2] + 6,   (-1.75, -0.2, 2.5),  (-1.95, 1.3, 2.05)),         # tiny bubble in his arm vein + check
+    (S[3] - 2,   (-2.2, -0.2, 2.5),   (-1.95, 1.3, 2.05)),
+    (S[3] + 6,   (-2.0, -0.9, 3.0),   (-2.55, 0.9, 2.5)),          # IV drip sneaks a few in
+    (S[4] - 2,   (-2.7, -0.8, 2.8),   (-2.4, 1.1, 2.15)),
+    (S[4] + 4,   (-2.0, 0.0, 2.45),   (-1.7, 1.33, 2.0)),          # carried along the arm...
+    (S[5] - 2,   (-0.5, 0.0, 2.9),    (-0.5, 1.45, 2.5)),          # ...up to the heart
+    (S[5] + 4,   (0.05, 0.3, 2.4),    (0.06, 1.28, 2.2)),          # heart pumps it to the lungs
+    (S[6] - 2,   (0.25, 0.3, 2.55),   (0.18, 1.28, 2.3)),
+    (S[6] + 4,   (0.55, 0.35, 2.6),   (0.25, 1.3, 2.4)),           # lungs = bubble filter
+    (S[7] - 2,   (0.0, 0.35, 2.6),    (0.2, 1.3, 2.4)),
+    (S[7] + 4,   (0.38, 0.62, 2.48),  (NX, NY, NZ)),               # trapped in the tiny vessels
+    (S[8] - 2,   (0.22, 0.62, 2.5),   (NX, NY, NZ)),
+    (S[8] + 4,   (0.3, -0.2, 3.0),    (0.15, 1.3, 2.9)),           # dissolves, breathed out
+    (S[9] - 2,   (-0.2, -0.6, 3.6),   (0.0, 1.5, 3.25)),
+    (S[9] + 4,   (-2.5, -0.9, 3.1),   (-2.0, 1.2, 2.15)),          # big rush of air
+    (S[10] - 2,  (-1.2, -0.5, 3.0),   (-1.0, 1.4, 2.2)),
+    (S[10] + 4,  (0.0, 0.42, 2.25),   (HCX, HCY, HCZ)),            # foam in the heart
+    (S[11] - 2,  (0.15, 0.45, 2.3),   (HCX, HCY, HCZ)),
+    (S[11] + 4,  (0.3, -1.6, 3.6),    (0.0, 1.3, 3.0)),            # air lock, STOP
+    (S[12] - 2,  (-0.3, -1.8, 3.7),   (0.0, 1.3, 3.0)),
+    (S[12] + 4,  (-2.4, -1.9, 2.9),   (-3.1, 0.4, 2.2)),           # nurse flicks
+    (S[13] - 2,  (-3.6, -1.7, 3.0),   (-3.0, 0.4, 2.5)),
+    (S[13] + 4,  (-2.6, -0.8, 2.4),   (PUX, IVY, PZ_)),            # IV pump alarm
+    (S[14] - 2,  (-3.6, -0.7, 2.4),   (PUX, IVY, PZ_)),
+    (S[14] + 4,  (1.3, -1.2, 3.6),    (0.4, 1.3, 2.9)),            # oxygen mask
+    (S[15] - 2,  (0.0, -1.3, 3.6),    (0.3, 1.3, 2.8)),
+    (S[15] + 4,  (5.2, 0.4, 3.4),     (CX - 0.6, CY, CZ)),         # pressure chamber
+    (S[16] - 2,  (2.6, 0.6, 3.4),     (CX, CY, CZ)),
+    (S[16] + 4,  (-5.0, 3.4, 2.0),    (DX, DY, 1.9)),              # diver, the bends
+    (S[17] - 2,  (-6.9, 3.5, 2.0),    (DX, DY, 1.8)),
+    (S[17] + 6,  (0.6, -3.0, 4.0),    (0.0, 1.5, 3.0)),            # final: myth?
+    (FRAMES - 1, (1.4, -4.0, 4.6),    (0.2, 1.5, 3.0)),
 ]
 
 def overhead(cl, tl):
@@ -800,5 +836,8 @@ for f, cl, tl in cam_keys:
     cam.location = cl; cam.keyframe_insert("location", frame=f)
     target.location = tl; target.keyframe_insert("location", frame=f)
 
+for o in bpy.data.objects:
+    if o.type == 'FONT':
+        o.visible_shadow = False
 bpy.ops.wm.save_as_mainfile(filepath=f"{HERE}/scene.blend")
 print("SCENE OK", FRAMES, S)
