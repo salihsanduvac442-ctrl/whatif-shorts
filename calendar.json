@@ -64,7 +64,12 @@
   "date": "2026-10-31",
   "title": "What if you had the punch of a mantis shrimp?",
   "category": "weird animal",
-  "status": "todo"
+  "status": "awaiting_approval",
+  "publish_at": "2026-10-31T16:00:00+03:00",
+  "planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=3101569706982787393",
+  "video": "videos/2026-10-31-mantis-punch.mp4",
+  "tiktok_publish_at": "2026-10-31T16:00:00+03:00",
+  "tiktok_planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=8188120362220078834"
  },
  {
   "day": 7,
