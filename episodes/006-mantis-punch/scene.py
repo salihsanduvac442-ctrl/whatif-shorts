@@ -404,9 +404,9 @@ for i in range(10):
         b_.location = (p0[0] + 0.02, p0[1], TZ + AH - 0.02); b_.keyframe_insert("location", frame=f + 59)
 
 # ---------------- the cartoon mantis shrimp (built at 10x, scaled 0.1 -> ~12 cm) ----------------
-SH = (TX - 0.06, TY + 0.02, FL + 0.03)
+SH = (TX - 0.08, TY + 0.02, FL + 0.04)
 shr = group("Shrimp", SH)
-K = 0.1
+K = 0.14
 def P(x, y, z):
     return (SH[0] + K * x, SH[1] + K * y, SH[2] + K * z)
 green = mat("ShG", (0.15, 0.72, 0.45), 0.4)
@@ -443,55 +443,66 @@ ap = [tube("ArmUp", [PV, P(0.62, -0.17, 0.0)], [K * 0.06, K * 0.055], red),
 attach(ap, arm)
 attach(sp + [arm], shr)
 club = ap[1]
-STRIKES = [8, S[2] + 6, S[3] + 6, S[6] + 10, S[8] + 4, S[11] + 4, S[11] + 14, S[12] + 10, S[17] + 8]
+STRIKES = [8, S[2] + 6, S[3] + 6, S[6] + 10, S[8] + 4, S[9] + 6, S[11] + 4, S[11] + 24, S[17] + 8]
 arm.rotation_euler = (0, -1.35, 0); arm.keyframe_insert("rotation_euler", frame=0)
 for f in STRIKES:
     strike(arm, f)
 # little bob
 for f in range(0, FRAMES, 16):
     shr.location = SH; shr.keyframe_insert("location", frame=f)
-    shr.location = (SH[0], SH[1], SH[2] + 0.004); shr.keyframe_insert("location", frame=f + 8)
+    shr.location = (SH[0], SH[1], SH[2] + 0.005); shr.keyframe_insert("location", frame=f + 8)
 
 def club_world(f):
     sc.frame_set(f); bpy.context.view_layer.update()
     return tuple(ap[2].matrix_world.translation)
 
-# ---------------- targets: snail (line 0 / 6) ----------------
-SN = (SH[0] + 0.13, SH[1] - 0.01, FL)
-shell_m = stripe_mat("Shell", (0.95, 0.7, 0.35), (0.65, 0.35, 0.15), axis="Z", freq=220.0, thresh=0.3, rough=0.5)
+# ---------------- targets that shatter: clam (hook), snail (line 6), clam (line 11) ----------------
+shell_m = stripe_mat("Shell", (0.98, 0.72, 0.35), (0.7, 0.35, 0.15), axis="Z", freq=160.0, thresh=0.3, rough=0.5)
+clam_m = stripe_mat("Clam", (0.95, 0.88, 0.95), (0.75, 0.45, 0.7), axis="X", freq=180.0, thresh=0.2, rough=0.5)
 snail_b = mat("SnailB", (0.85, 0.8, 0.55), 0.5)
-halves = []
-for sx in (-1, 1):
-    h = group(f"ShellHalf{sx}", (SN[0], SN[1], SN[2] + 0.03))
-    hp = [sphere("ShellH", (SN[0] + sx * 0.012, SN[1], SN[2] + 0.03), 0.028, shell_m, scale=(0.45, 1, 1), sub=3)]
-    attach(hp, h); halves.append((h, sx))
-snb = sphere("SnailBody", (SN[0] + 0.02, SN[1], SN[2] + 0.008), 0.02, snail_b, scale=(1.8, 0.8, 0.5), sub=2)
-for sy in (-1, 1):
-    sphere("SnEye", (SN[0] + 0.05, SN[1] + sy * 0.008 - 0.004, SN[2] + 0.03), 0.005, eyeb, sub=1)
-HIT6 = S[6] + 10
-for h, sx in halves:
-    h.keyframe_insert("location", frame=HIT6)
-    h.keyframe_insert("rotation_euler", frame=HIT6)
-    h.location = (SN[0] + sx * 0.07, SN[1] - 0.03, SN[2] + 0.06); h.keyframe_insert("location", frame=HIT6 + 6)
-    h.rotation_euler = (0, sx * 1.2, 0); h.keyframe_insert("rotation_euler", frame=HIT6 + 6)
-    h.location = (SN[0] + sx * 0.1, SN[1] - 0.03, SN[2] + 0.01); h.keyframe_insert("location", frame=HIT6 + 12)
-    gone_at(h, S[8] - 2)
-gone_at(snb, S[8] - 2)
-cw = club_world(HIT6)
-burst(cw, HIT6, 10, 0.05, 0.005)
-pw = text("Pow", "POW!", (SN[0] + 0.02, AY0 - 0.02, FL + 0.17), 0.07, lab_m, extrude=0.006)
+def shatter(loc, r, material, f_hit, f_gone, n=12, scale=(1, 1, 1), spread=1.0):
+    """a shell built from chunks; at f_hit the chunks blast outward and land on the sand."""
+    for i in range(n):
+        th = i / n * 6.283; ph = random.uniform(-0.6, 1.0)
+        off = (r * 0.55 * math.cos(th) * math.cos(ph) * scale[0], r * 0.55 * math.sin(th) * math.cos(ph) * scale[1], r * 0.55 * math.sin(ph) * scale[2])
+        p0 = (loc[0] + off[0], loc[1] + off[1], loc[2] + off[2])
+        c = sphere("Chunk", p0, r * 0.55, material, sub=1, smooth=False)
+        d = Vector(off).normalized() if Vector(off).length > 0 else Vector((1, 0, 0))
+        p1 = (p0[0] + d.x * r * 2.6 * spread + r * 1.2, p0[1] + d.y * r * 1.5 * spread - r * 0.8, p0[2] + r * 2.2 * spread)
+        p2 = (p0[0] + d.x * r * 4.0 * spread + r * 1.8, p0[1] + d.y * r * 2.2 * spread - r, FL + 0.006)
+        key_loc(c, [(f_hit, p0), (f_hit + 5, p1), (f_hit + 12, p2)])
+        c.rotation_euler = (0, 0, 0); c.keyframe_insert("rotation_euler", frame=f_hit)
+        c.rotation_euler = (random.uniform(2, 5), random.uniform(2, 5), 0); c.keyframe_insert("rotation_euler", frame=f_hit + 12)
+        keyscale(c, [(f_hit + 13, 1.0), (f_gone - 3, 0.6), (f_gone, 0.001)])
+    burst(loc, f_hit, 10, r * 2.2, r * 0.18, f_hit + 10, yoff=-r * 1.2)
+def club_hit_point(f):
+    cw = club_world(f)
+    return (cw[0] + 0.02, cw[1], max(cw[2], FL + 0.03))
+# hook: clam right in front of the club
+CL1 = club_hit_point(8)
+shatter((CL1[0] + 0.012, CL1[1], FL + 0.022), 0.024, clam_m, 8, S[1] + 4, scale=(1.3, 1, 0.6))
+pw = text("Pow", "POW!", (SH[0] + 0.1, AY0 - 0.02, TZ + AH + 0.11), 0.09, lab_m, extrude=0.008)
 pop(pw, 9, 4, 30)
-newt = text("Newt", "1,500 N", (TX + 0.05, AY0 - 0.03, TZ + AH + 0.08), 0.085, lab_m, extrude=0.008)
+# line 6: snail shell explodes
+HIT6 = S[6] + 10
+SNP = club_hit_point(HIT6)
+SN = (SNP[0] + 0.03, SH[1] - 0.005, FL)
+shatter((SN[0], SN[1], FL + 0.035), 0.034, shell_m, HIT6, S[8] - 2, n=14, scale=(1, 1, 1.1))
+snb = sphere("SnailBody", (SN[0] + 0.025, SN[1], FL + 0.01), 0.024, snail_b, scale=(1.8, 0.8, 0.5), sub=2)
+for sy in (-1, 1):
+    e_ = sphere("SnEye", (SN[0] + 0.06, SN[1] + sy * 0.01 - 0.006, FL + 0.035), 0.006, eyeb, sub=1)
+    gone_at(e_, S[8] - 2)
+gone_at(snb, S[8] - 2)
+newt = text("Newt", "1,500 N", (SN[0] - 0.04, AY0 - 0.03, TZ + AH + 0.05), 0.075, lab_m, extrude=0.008)
 pop(newt, HIT6, 5, S[7] + 2)
-
 # ---------------- line 1: ruler "10 cm" ----------------
 rul = group("Ruler", (SH[0] - 0.01, AY0 - 0.03, FL - 0.0))
-rp = [box("RulerB", (SH[0] - 0.01, AY0 - 0.03, TZ + 0.012), (0.13, 0.04, 0.012), mat("RulerM", (1.0, 0.9, 0.3), 0.5))]
+rp = [box("RulerB", (SH[0] - 0.01, AY0 - 0.03, TZ + 0.012), (0.18, 0.04, 0.012), mat("RulerM", (1.0, 0.9, 0.3), 0.5))]
 for i in range(11):
-    rp.append(box("Tick", (SH[0] - 0.06 + i * 0.01, AY0 - 0.05, TZ + 0.019), (0.0015, 0.004, 0.003 if i % 5 else 0.006), eyeb))
+    rp.append(box("Tick", (SH[0] - 0.085 + i * 0.017, AY0 - 0.05, TZ + 0.019), (0.0015, 0.004, 0.003 if i % 5 else 0.006), eyeb))
 attach(rp, rul)
 pop(rul, S[1], 5, S[3])
-cm10 = text("CM10", "10 cm", (SH[0] - 0.01, AY0 - 0.06, FL + 0.16), 0.05, white_lab, extrude=0.005)
+cm10 = text("CM10", "10 cm", (SH[0] - 0.01, AY0 - 0.06, TZ + AH + 0.05), 0.08, white_lab, extrude=0.005)
 pop(cm10, S[1] + 4, 5, S[2] + 2)
 
 # ---------------- line 2: a car zooms by at 80 km/h ----------------
@@ -597,14 +608,16 @@ for i in range(16):
     b_ = sphere("Cav", p_, random.uniform(0.004, 0.009), bubble_m, sub=2)
     f0 = S[8] + 4 + i // 2
     keyscale(b_, [(0, 0.001), (f0 - 1, 0.001), (f0 + 3, 1.3), (f0 + 8, 1.0), (S[9] + 4, 1.1), (S[9] + 8, 0.001)])
-flash = sphere("Flash", CB, 0.035, glow_mat("FlashM", (0.85, 0.95, 1.0), 4.0), sub=2)
+flash = sphere("Flash", CB, 0.035, glow_mat("FlashM", (0.85, 0.95, 1.0), 2.0), sub=2)
 keyscale(flash, [(0, 0.001), (S[9] + 6, 0.001), (S[9] + 8, 0.9), (S[9] + 11, 0.5), (S[9] + 13, 0.8), (S[9] + 18, 0.001)])
 bpy.ops.object.light_add(type='POINT', location=(CB[0], CB[1] - 0.05, CB[2] + 0.03))
 fl = bpy.context.object; fl.data.color = (0.8, 0.9, 1.0); fl.data.shadow_soft_size = 0.02
 fl.data.energy = 0; fl.data.keyframe_insert("energy", frame=S[9] + 6)
-fl.data.energy = 4; fl.data.keyframe_insert("energy", frame=S[9] + 8)
+fl.data.energy = 1.5; fl.data.keyframe_insert("energy", frame=S[9] + 8)
 fl.data.energy = 0; fl.data.keyframe_insert("energy", frame=S[9] + 18)
 burst(CB, S[9] + 8, 12, 0.05, 0.004, S[10])
+hit2 = text('Hit2', 'HIT 2!', (TX, AY0 - 0.03, TZ + AH + 0.05), 0.1, red_lab, extrude=0.008)
+pop(hit2, S[9] + 8, 4, S[10] + 2)
 heat = sphere("Heat", CB, 0.03, glow_mat("HeatM", (1.0, 0.45, 0.08), 9.0), sub=2)
 keyscale(heat, [(0, 0.001), (S[10] - 1, 0.001), (S[10] + 3, 1.3), (S[10] + 8, 0.9), (S[10] + 13, 1.2), (S[10] + 20, 0.9), (S[11] - 1, 0.001)])
 THX, THY = TX + 0.5, TY - 0.15
@@ -619,21 +632,15 @@ keyscale(merc, [(0, (1, 1, 0.001)), (S[10], (1, 1, 0.05)), (S[10] + 14, (1, 1, 1
 hot = text("Hot", "1000s °C", (THX - 0.2, AY0 - 0.06, TZ + AH + 0.1), 0.08, red_lab, extrude=0.008)
 pop(hot, S[10] + 4, 5, S[11] + 2)
 
-# ---------------- line 11: hit twice (1, 2) ----------------
-T2 = club_world(S[11] + 4)
-for j, f in enumerate([S[11] + 4, S[11] + 14]):
-    t_ = text(f"Hit{j}", str(j + 1), (T2[0] + 0.03 + 0.07 * j, AY0 - 0.02, T2[2] + 0.1), 0.08, lab_m if j == 0 else red_lab, extrude=0.008)
-    pop(t_, f, 4, S[12])
-    burst(T2, f, 8, 0.035 + 0.015 * j, 0.004, S[12])
-x2 = text("HitX2", "x2", (TX + 0.05, AY0 - 0.03, TZ + AH + 0.06), 0.12, lab_m, extrude=0.008)
-pop(x2, S[11] + 16, 4, S[12])
-
+# ---------------- line 11: smashes a clam, then the aquarium glass ----------------
+CL2 = club_hit_point(S[11] + 4)
+shatter((CL2[0] + 0.012, CL2[1], FL + 0.022), 0.026, clam_m, S[11] + 4, S[12], scale=(1.3, 1, 0.6))
 # ---------------- line 12: turns to the front glass and cracks it ----------------
-shr.rotation_euler = (0, 0, 0); shr.keyframe_insert("rotation_euler", frame=S[12])
-shr.rotation_euler = (0, 0, math.radians(-62)); shr.keyframe_insert("rotation_euler", frame=S[12] + 6)
-shr.keyframe_insert("rotation_euler", frame=S[13] - 4)
-shr.rotation_euler = (0, 0, 0); shr.keyframe_insert("rotation_euler", frame=S[13] + 4)
-CG = club_world(S[12] + 10)
+shr.rotation_euler = (0, 0, 0); shr.keyframe_insert("rotation_euler", frame=S[11] + 12)
+shr.rotation_euler = (0, 0, math.radians(-62)); shr.keyframe_insert("rotation_euler", frame=S[11] + 18)
+shr.keyframe_insert("rotation_euler", frame=S[12] + 30)
+shr.rotation_euler = (0, 0, 0); shr.keyframe_insert("rotation_euler", frame=S[12] + 36)
+CG = club_world(S[11] + 24)
 CC = (CG[0], AY0 - 0.004, CG[2] + 0.01)
 crack_m = glow_mat("Crack", (1, 1, 1), 2.5)
 cr_objs = []
@@ -649,12 +656,12 @@ for k in range(9):
 ring = tube("CrackRing", [(CC[0] + 0.035 * math.cos(a / 16 * 6.283), CC[1], CC[2] + 0.035 * math.sin(a / 16 * 6.283)) for a in range(17)], [0.0016] * 17, crack_m)
 for o in cr_objs + [ring]:
     bpy.context.view_layer.update()
-    hide_until(o, S[12] + 10)
-crk = text("Crk", "CRACK!", (CC[0], AY0 - 0.03, TZ + AH + 0.08), 0.09, lab_m, extrude=0.008)
-pop(crk, S[12] + 10, 4, S[13] + 4)
-burst(CC, S[12] + 10, 10, 0.06, 0.005, S[13])
+    hide_until(o, S[11] + 24)
+crk = text("Crk", "CRACK!", (CC[0], AY0 - 0.03, TZ + AH + 0.04), 0.08, lab_m, extrude=0.008)
+pop(crk, S[11] + 24, 4, S[12] + 2)
+burst(CC, S[11] + 24, 10, 0.06, 0.005, S[12])
 
-# ---------------- lines 13-17: YOU with the mantis punch ----------------
+# ---------------- lines 12-17: YOU — a normal punch, then the mantis-shrimp punch ----------------
 MX, MYY = 3.3, 0.9
 skin_m = mat("Skin", (0.95, 0.74, 0.58), 0.6)
 shirt_m = mat("Shirt", (0.95, 0.3, 0.25), 0.7)
@@ -672,10 +679,18 @@ for sx in (-1, 1):
 grin = tube("MGrin", [(MX - 0.12, MYY - 0.31, 2.14), (MX, MYY - 0.35, 2.08), (MX + 0.12, MYY - 0.31, 2.14)], [0.02] * 3, eyeb)
 tube("MArmL", [(MX - 0.38, MYY, 1.75), (MX - 0.5, MYY - 0.05, 1.3), (MX - 0.48, MYY - 0.1, 1.0)], [0.09, 0.085, 0.08], shirt_m)
 sphere("MHandL", (MX - 0.48, MYY - 0.1, 0.95), 0.09, skin_m, sub=2)
-# punching arm (screen-right) with a mantis-club glove
+# "ouch" face during the normal punch (mouth turns down), happy again with the shrimp power
+grin.keyframe_insert("rotation_euler", frame=S[12] + 12); grin.keyframe_insert("location", frame=S[12] + 12)
+grin.rotation_euler = (0, math.radians(180), 0); grin.location = (2 * MX, 0, 2 * 2.11)
+grin.keyframe_insert("rotation_euler", frame=S[12] + 14); grin.keyframe_insert("location", frame=S[12] + 14)
+grin.keyframe_insert("rotation_euler", frame=S[13] + 2); grin.keyframe_insert("location", frame=S[13] + 2)
+grin.rotation_euler = (0, 0, 0); grin.location = (0, 0, 0)
+grin.keyframe_insert("rotation_euler", frame=S[13] + 4); grin.keyframe_insert("location", frame=S[13] + 4)
+grin.keyframe_insert("rotation_euler", frame=0); grin.keyframe_insert("location", frame=0)
+# punching arm (screen-right)
 parm = group("PArm", (MX + 0.38, MYY - 0.05, 1.7))
 pa = [tube("MArmR", [(MX + 0.38, MYY - 0.05, 1.7), (MX + 0.95, MYY - 0.12, 1.62)], [0.09, 0.085], shirt_m),
-      sphere("MHandR", (MX + 1.0, MYY - 0.12, 1.62), 0.1, skin_m, sub=2)]
+      sphere("MHandR", (MX + 1.0, MYY - 0.12, 1.62), 0.11, skin_m, sub=2)]
 attach(pa, parm)
 glove = group("Glove", (MX + 1.08, MYY - 0.12, 1.62))
 gl = [sphere("GloveB", (MX + 1.08, MYY - 0.12, 1.62), 0.2, orange, scale=(1.25, 1, 1), sub=3),
@@ -688,43 +703,47 @@ for pl in plates:
     hide_until(pl, S[16] + 2)
 attach(gl + plates, glove)
 glove.parent = parm; glove.matrix_parent_inverse = parm.matrix_world.inverted()
-parm.rotation_euler = (0, -1.0, 0)        # arm raised in a guard at first
-parm.keyframe_insert("rotation_euler", frame=0)
-pop(glove, S[13] + 4, 6)
-burst((MX + 1.1, MYY - 0.3, 2.0), S[13] + 8, 10, 0.4, 0.04)
-youl = text("YouL", "YOU", (MX, MYY - 0.4, 3.0), 0.4, lab_m, extrude=0.03)
-pop(youl, S[13], 5, S[14])
-# boulder (line 15) to the right
-BX, BY = MX + 2.25, MYY + 0.05
+hide_until(glove, S[13] + 2)
+keyscale(glove, [(S[13] + 2, 0.001), (S[13] + 6, 1.2), (S[13] + 9, 1.0)])
+GUARD = (0, -1.0, 0)
+REST = (MX + 0.38, MYY - 0.05, 1.7)
+def punch(f_hit, reach, bounce=False):
+    parm.rotation_euler = GUARD; parm.keyframe_insert("rotation_euler", frame=f_hit - 5)
+    parm.location = REST; parm.keyframe_insert("location", frame=f_hit - 5)
+    parm.rotation_euler = (0, 0.05, 0); parm.keyframe_insert("rotation_euler", frame=f_hit)
+    parm.location = (REST[0] + reach, REST[1], REST[2]); parm.keyframe_insert("location", frame=f_hit)
+    if bounce:   # fist stops dead and recoils
+        parm.location = (REST[0] - 0.05, REST[1], REST[2]); parm.keyframe_insert("location", frame=f_hit + 4)
+        parm.rotation_euler = (0, -0.3, 0); parm.keyframe_insert("rotation_euler", frame=f_hit + 4)
+    else:
+        parm.keyframe_insert("location", frame=f_hit + 6); parm.keyframe_insert("rotation_euler", frame=f_hit + 6)
+    parm.rotation_euler = GUARD; parm.keyframe_insert("rotation_euler", frame=f_hit + 14)
+    parm.location = REST; parm.keyframe_insert("location", frame=f_hit + 14)
+parm.rotation_euler = GUARD; parm.keyframe_insert("rotation_euler", frame=0)
+youl = text("YouL", "YOU", (MX, MYY - 0.4, 3.6), 0.4, lab_m, extrude=0.03)
+pop(youl, S[12], 5, S[12] + 14)
+# the boulder (hit twice)
+BX, BY, BR = MX + 1.95, MYY + 0.05, 0.75
 rock_m = mat("Boulder", (0.55, 0.53, 0.5), 0.85)
-bh = []
-for sx in (-1, 1):
-    g = group(f"Boulder{sx}", (BX, BY, 0.7))
-    bpart = sphere("BoulderH", (BX + sx * 0.36, BY, 0.75), 0.75, rock_m, scale=(0.5, 0.9, 1.0), sub=2, smooth=False)
-    attach([bpart], g); bh.append((g, sx))
-HIT15 = S[15] + 10
-parm.keyframe_insert("rotation_euler", frame=HIT15 - 4)
-parm.keyframe_insert("location", frame=HIT15 - 4)
-parm.rotation_euler = (0, 0.05, 0); parm.keyframe_insert("rotation_euler", frame=HIT15 - 1)
-parm.location = (MX + 0.55, MYY - 0.05, 1.7); parm.keyframe_insert("location", frame=HIT15 - 1)
-parm.keyframe_insert("location", frame=HIT15 + 6)
-parm.location = (MX + 0.38, MYY - 0.05, 1.7); parm.keyframe_insert("location", frame=HIT15 + 12)
-parm.keyframe_insert("rotation_euler", frame=S[17])
-parm.rotation_euler = (0, -1.4, 0); parm.keyframe_insert("rotation_euler", frame=S[17] + 6)   # fist up at the end
-for g, sx in bh:
-    g.keyframe_insert("location", frame=HIT15); g.keyframe_insert("rotation_euler", frame=HIT15)
-    g.location = (BX + sx * 0.7, BY, 0.7); g.keyframe_insert("location", frame=HIT15 + 6)
-    g.rotation_euler = (0, sx * 0.45, 0); g.keyframe_insert("rotation_euler", frame=HIT15 + 6)
-    g.location = (BX + sx * 0.8, BY, 0.7); g.keyframe_insert("location", frame=HIT15 + 14)
-burst((BX - 0.4, BY - 0.6, 1.6), HIT15, 14, 0.5, 0.05, S[16] + 4)
-dust_m = mat("Dust", (0.85, 0.8, 0.7), 0.9)
-for i in range(16):
-    p0 = (BX + random.uniform(-0.3, 0.3), BY - 0.5, random.uniform(0.3, 1.4))
-    d = sphere("Dust", p0, random.uniform(0.08, 0.16), dust_m, sub=1, smooth=False)
-    key_loc(d, [(HIT15, p0), (HIT15 + 16, (p0[0] + random.uniform(-1.2, 1.2), p0[1] - 0.3, p0[2] + random.uniform(0.3, 1.0)))])
-    keyscale(d, [(0, 0.001), (HIT15 - 1, 0.001), (HIT15 + 2, 1.0), (HIT15 + 14, 0.8), (HIT15 + 18, 0.001)])
-spl = text("Split", "SPLIT!", (BX, BY - 0.9, 2.3), 0.42, lab_m, extrude=0.03)
-pop(spl, HIT15 + 2, 5, S[16] + 2)
+boulder = sphere("Boulder", (BX, BY, BR * 0.95), BR, rock_m, scale=(1, 1, 0.95), sub=2, smooth=False)
+# line 12: NORMAL punch — fist bounces off, boulder only wobbles
+HIT12 = S[12] + 12
+punch(HIT12, 0.12, bounce=True)
+boulder.rotation_euler = (0, 0, 0); boulder.keyframe_insert("rotation_euler", frame=HIT12)
+boulder.rotation_euler = (0, 0.04, 0); boulder.keyframe_insert("rotation_euler", frame=HIT12 + 2)
+boulder.rotation_euler = (0, 0, 0); boulder.keyframe_insert("rotation_euler", frame=HIT12 + 5)
+norm = text("Norm", "NORMAL PUNCH", (MX + 0.9, MYY - 0.6, 4.05), 0.24, white_lab, extrude=0.02)
+pop(norm, S[12] + 4, 5, S[13])
+ouch = text("Ouch", "OUCH!", (MX + 1.2, MYY - 0.8, 3.75), 0.34, red_lab, extrude=0.03)
+pop(ouch, HIT12 + 1, 4, S[13])
+for k in range(5):   # little stars around the sore hand
+    a = k / 5 * 6.283
+    s_ = sphere("Star", (MX + 1.25 + 0.28 * math.cos(a), MYY - 0.3, 1.65 + 0.28 * math.sin(a)), 0.05, lab_m, sub=1)
+    pop(s_, HIT12 + 2 + k, 3, S[13])
+# line 13: shrimp power switched on
+burst((MX + 1.15, MYY - 0.35, 1.65), S[13] + 4, 12, 0.45, 0.05, S[13] + 20)
+spw = text("SPow", "SHRIMP POWER", (MX + 1.0, MYY - 0.6, 3.2), 0.17, lab_m, extrude=0.02)
+pop(spw, S[13] + 4, 5, S[14])
 # line 14: 100 cars pile behind him
 CXp, CYp = MX - 0.6, MYY + 4.2
 k = 0
@@ -738,14 +757,42 @@ for z in range(5):
             f0 = S[14] + 2 + k // 3
             o.keyframe_insert("scale", frame=f0)
             o.scale = (1.0,) * 3; o.keyframe_insert("scale", frame=f0 + 4)
+            gone_at(o, S[15] - 2 + (k % 5), 4)
             k += 1
 c100 = text("C100", "100 CARS", (CXp, CYp - 1.0, 5.6), 1.1, lab_m, extrude=0.05)
 pop(c100, S[14] + 14, 5, S[15] + 2)
-# line 16: armor shine on the glove
-armt = text("Armor", "ARMOR", (MX + 0.95, MYY - 0.6, 2.75), 0.36, blue_lab, extrude=0.03)
+# line 15: SHRIMP punch — the boulder bursts and the pieces fly across the yard
+HIT15 = S[15] + 6
+punch(HIT15, 0.2)
+gone_at(boulder, HIT15 + 1, 1)
+chunk_m = [rock_m, mat("Boulder2", (0.48, 0.46, 0.44), 0.85), mat("Boulder3", (0.62, 0.6, 0.56), 0.85)]
+for i in range(18):
+    th = random.uniform(-1.2, 1.2); ph = random.uniform(-0.8, 1.0)
+    p0 = (BX + 0.4 * math.cos(ph) * math.cos(th), BY + 0.4 * math.cos(ph) * math.sin(th), BR + 0.5 * math.sin(ph))
+    c = sphere("RockChunk", p0, random.uniform(0.18, 0.32), random.choice(chunk_m), sub=1, smooth=False)
+    dist = random.uniform(3, 7)
+    p2 = (BX + dist, BY + random.uniform(2.0, 9.0), 0.15)
+    pm = (BX + dist * 0.5, (p0[1] + p2[1]) / 2, random.uniform(2.5, 5.0))
+    key_loc(c, [(HIT15, p0), (HIT15 + 9, pm), (HIT15 + 20, p2)])
+    c.rotation_euler = (0, 0, 0); c.keyframe_insert("rotation_euler", frame=HIT15)
+    c.rotation_euler = (random.uniform(4, 9), random.uniform(4, 9), 0); c.keyframe_insert("rotation_euler", frame=HIT15 + 20)
+    keyscale(c, [(0, 0.001), (HIT15, 0.001), (HIT15 + 1, 1.0)])
+burst((BX - 0.3, BY - 0.8, 1.6), HIT15, 14, 0.6, 0.06, S[16] + 4)
+dust_m = mat("Dust", (0.85, 0.8, 0.7), 0.9)
+for i in range(16):
+    p0 = (BX + random.uniform(-0.4, 0.4), BY - 0.3, random.uniform(0.3, 1.4))
+    d = sphere("Dust", p0, random.uniform(0.12, 0.22), dust_m, sub=1, smooth=False)
+    key_loc(d, [(HIT15, p0), (HIT15 + 16, (p0[0] + random.uniform(0, 2.0), p0[1] - 0.3, p0[2] + random.uniform(0.3, 1.2)))])
+    keyscale(d, [(0, 0.001), (HIT15 - 1, 0.001), (HIT15 + 2, 1.0), (HIT15 + 14, 0.8), (HIT15 + 18, 0.001)])
+boom = text("Boom", "BOOM!", (BX + 0.3, BY - 1.0, 3.3), 0.5, lab_m, extrude=0.04)
+pop(boom, HIT15 + 1, 4, S[16] + 2)
+# line 16: armor plates on the glove
+armt = text("Armor", "ARMOR", (MX + 0.95, MYY - 0.6, 3.2), 0.22, blue_lab, extrude=0.03)
 pop(armt, S[16] + 4, 5, S[17])
+parm.keyframe_insert("rotation_euler", frame=S[17])
+parm.rotation_euler = (0, -1.4, 0); parm.keyframe_insert("rotation_euler", frame=S[17] + 6)   # fist up at the end
 # line 17: question mark
-q = text("Q", "?", (MX + 0.2, MYY - 0.3, 3.2), 0.9, lab_m, extrude=0.08)
+q = text("Q", "?", (MX + 0.2, MYY - 0.3, 3.95), 0.8, lab_m, extrude=0.08)
 pop(q, S[17] + 2, 6)
 q.rotation_euler = (math.radians(90), 0, 0); q.keyframe_insert("rotation_euler", frame=S[17] + 2)
 q.rotation_euler = (math.radians(90), 0, math.radians(360)); q.keyframe_insert("rotation_euler", frame=FRAMES)
@@ -763,44 +810,48 @@ cam.data.clip_end = 200000
 target = bpy.data.objects.new("Target", None); sc.collection.objects.link(target)
 tr = cam.constraints.new('TRACK_TO'); tr.target = target
 tr.track_axis = 'TRACK_NEGATIVE_Z'; tr.up_axis = 'UP_Y'
-SHC = (SH[0] + 0.05, SH[1], FL + 0.06)
+SHC = (SH[0] + 0.06, SH[1], FL + 0.03)
+SNC = (SN[0] - 0.03, SN[1], FL + 0.03)
+CL2C = (CL2[0], CL2[1], FL + 0.03)
+# (frame, camera, SUBJECT) — the subject is framed in the lower third, under the centre captions
 cam_keys = [
-    (0,          (0.35, -0.55, 1.25),  (0.0, 1.0, 0.9)),            # hook: garden, tank on the table
-    (S[1] - 6,   (0.15, 0.25, 1.05),  SHC),                        # push in on the shrimp
-    (S[1] + 4,   (-0.05, 0.38, 1.0),  (SH[0], SH[1], FL + 0.04)),  # 10 cm
-    (S[2] - 4,   (0.2, 0.4, 1.0),     (SH[0], SH[1], FL + 0.04)),
-    (S[2] + 4,   (0.5, -3.4, 1.6),    (0.0, 0.0, 0.7)),            # car zoom 80 km/h
-    (S[3] - 2,   (-0.6, -3.2, 1.8),   (-0.4, 0.2, 0.9)),
-    (S[3] + 6,   (-0.2, -3.6, 2.4),   (GX, GY, 1.6)),              # 10,000 G bar
-    (S[4] - 2,   (-1.6, -3.8, 2.6),   (GX, GY, 1.8)),
-    (S[4] + 4,   (-1.8, -1.2, 1.4),   (GX - 0.3, GY, 0.8)),        # 9 G jet
-    (S[5] - 2,   (-1.1, -1.0, 1.4),   (GX - 0.3, GY, 0.8)),
-    (S[5] + 4,   (-0.7, -1.0, 1.2),   (WX, WY, WZ - 0.1)),         # stopwatch
-    (S[6] - 2,   (-1.2, -1.1, 1.3),   (WX, WY, WZ - 0.1)),
-    (S[6] + 4,   (0.1, 0.25, 1.02),   (SN[0] - 0.02, SN[1], FL + 0.05)),  # snail smashed, 1,500 N
-    (S[7] - 2,   (-0.05, 0.3, 1.1),   (SN[0] - 0.04, SN[1], FL + 0.08)),
-    (S[7] + 4,   (0.4, -1.4, 1.5),    (TX, TY - 0.6, 0.45)),       # x2,500 pile
-    (S[8] - 2,   (-0.3, -1.5, 1.4),   (TX, TY - 0.6, 0.45)),
-    (S[8] + 4,   (CB[0] + 0.08, CB[1] - 0.45, CB[2] + 0.08), CB),  # bubbles
+    (0,          (0.1, -0.05, 1.08),   SHC),                                     # hook: clam smashed
+    (S[1] - 6,   (0.02, 0.33, 0.98),   (SH[0] + 0.02, SH[1], FL + 0.02)),         # 10 cm
+    (S[1] + 4,   (-0.12, 0.38, 0.97),  (SH[0] + 0.02, SH[1], FL + 0.02)),
+    (S[2] - 4,   (0.12, 0.4, 0.99),    (SH[0] + 0.02, SH[1], FL + 0.02)),
+    (S[2] + 4,   (0.5, -3.4, 1.6),     (0.0, -0.3, 0.35)),                        # car zoom 80 km/h
+    (S[3] - 2,   (-0.6, -3.2, 1.8),    (-0.4, 0.0, 0.45)),
+    (S[3] + 6,   (-0.2, -3.6, 2.4),    (GX, GY, 0.9)),                            # 10,000 G
+    (S[4] - 2,   (-1.6, -3.8, 2.6),    (GX, GY, 1.0)),
+    (S[4] + 4,   (-1.8, -1.2, 1.4),    (GX - 0.3, GY, 0.6)),                      # 9 G
+    (S[5] - 2,   (-1.1, -1.0, 1.4),    (GX - 0.3, GY, 0.6)),
+    (S[5] + 4,   (-0.7, -1.1, 1.3),    (WX, WY, WZ - 0.15)),                      # stopwatch
+    (S[6] - 2,   (-1.2, -1.2, 1.4),    (WX, WY, WZ - 0.15)),
+    (S[6] + 4,   (SN[0] - 0.02, 0.36, 0.99), SNC),                                # snail shell explodes
+    (S[7] - 2,   (SN[0] - 0.1, 0.38, 1.0),   SNC),
+    (S[7] + 4,   (0.4, -1.4, 1.5),     (TX, TY - 0.6, 0.2)),                      # x2,500
+    (S[8] - 2,   (-0.3, -1.5, 1.4),    (TX, TY - 0.6, 0.2)),
+    (S[8] + 4,   (CB[0] + 0.08, CB[1] - 0.45, CB[2] + 0.08), CB),                 # bubbles
     (S[9] - 2,   (CB[0] - 0.06, CB[1] - 0.42, CB[2] + 0.07), CB),
-    (S[9] + 4,   (CB[0] + 0.02, CB[1] - 0.38, CB[2] + 0.06),  CB),  # flash
+    (S[9] + 4,   (CB[0] + 0.02, CB[1] - 0.4, CB[2] + 0.06),  CB),                 # flash, hit 2
     (S[10] - 2,  (CB[0] + 0.08, CB[1] - 0.42, CB[2] + 0.06), CB),
-    (S[10] + 4,  (0.3, 0.1, 1.15),    (0.25, TY - 0.1, TZ + 0.25)),  # heat + thermometer
-    (S[11] - 2,  (0.1, 0.05, 1.2),    (0.2, TY - 0.1, TZ + 0.25)),
-    (S[11] + 4,  (T2[0] + 0.02, 0.4, 1.0), (T2[0] + 0.04, T2[1], T2[2] + 0.04)),  # hit twice
-    (S[12] - 2,  (T2[0] - 0.06, 0.4, 1.0), (T2[0] + 0.02, T2[1], T2[2] + 0.04)),
-    (S[12] + 6,  (CC[0] + 0.05, 0.1, 1.05), (CC[0], CC[1], CC[2] + 0.04)),  # cracks the glass
-    (S[13] - 2,  (CC[0] - 0.05, 0.0, 1.1), (CC[0], CC[1], CC[2] + 0.04)),
-    (S[13] + 4,  (3.6, -3.4, 2.6),    (MX + 0.4, MYY, 1.7)),       # YOU + glove
-    (S[14] - 2,  (4.0, -3.0, 2.4),    (MX + 0.5, MYY, 1.7)),
-    (S[14] + 4,  (2.8, -6.8, 4.2),    (CXp, CYp, 2.4)),            # 100 cars
-    (S[15] - 2,  (1.6, -7.0, 4.4),    (CXp + 0.5, CYp - 1, 2.4)),
-    (S[15] + 4,  (4.6, -3.6, 2.3),    (BX - 0.6, BY, 1.3)),        # split the boulder
-    (S[16] - 2,  (5.4, -3.6, 2.2),    (BX - 0.4, BY, 1.2)),
-    (S[16] + 4,  (MX + 1.2, MYY - 2.2, 2.2), (MX + 0.9, MYY, 1.75)),   # armor
-    (S[17] - 2,  (MX + 0.6, MYY - 2.2, 2.2), (MX + 0.9, MYY, 1.8)),
-    (S[17] + 6,  (3.0, -3.4, 2.8),    (MX + 0.3, MYY, 1.9)),       # final question
-    (FRAMES - 1, (2.6, -3.2, 3.0),    (MX + 0.1, MYY, 2.1)),
+    (S[10] + 4,  (0.3, 0.05, 1.15),    (0.2, TY - 0.1, TZ + 0.12)),               # heat
+    (S[11] - 2,  (0.1, 0.0, 1.2),      (0.2, TY - 0.1, TZ + 0.12)),
+    (S[11] + 4,  (CL2[0] + 0.02, 0.38, 0.99), CL2C),                              # clam smashed
+    (S[11] + 16, (CC[0] + 0.03, 0.2, 1.02),   (CC[0], CC[1], CC[2] - 0.01)),      # glass cracks
+    (S[12] - 2,  (CC[0] - 0.04, 0.15, 1.04),  (CC[0], CC[1], CC[2] - 0.01)),
+    (S[12] + 4,  (4.6, -3.4, 2.4),     (MX + 0.9, MYY, 1.6)),                     # normal punch, ouch
+    (S[13] - 2,  (4.9, -3.2, 2.3),     (MX + 0.9, MYY, 1.6)),
+    (S[13] + 4,  (MX + 1.4, MYY - 2.6, 2.0), (MX + 0.9, MYY, 1.75)),               # shrimp power glove
+    (S[14] - 2,  (MX + 0.8, MYY - 2.6, 2.0), (MX + 0.9, MYY, 1.75)),
+    (S[14] + 4,  (2.8, -6.8, 4.2),     (CXp, CYp, 0.6)),                          # 100 cars
+    (S[15] - 2,  (3.6, -5.4, 3.2),     (BX - 0.5, BY, 0.6)),
+    (S[15] + 8,  (4.0, -5.2, 3.0),     (BX + 0.2, BY + 1.2, 0.5)),                      # boulder bursts, flies
+    (S[16] - 2,  (4.8, -5.8, 3.4),     (BX + 1.0, BY + 2.5, 0.4)),
+    (S[16] + 4,  (MX + 1.2, MYY - 2.3, 2.2), (MX + 0.9, MYY, 1.75)),               # armor
+    (S[17] - 2,  (MX + 0.6, MYY - 2.3, 2.2), (MX + 0.9, MYY, 1.75)),
+    (S[17] + 6,  (3.0, -3.4, 2.8),     (MX + 0.3, MYY, 1.6)),                     # final question
+    (FRAMES - 1, (2.6, -3.2, 3.0),     (MX + 0.1, MYY, 1.6)),
 ]
 
 def overhead(cl, tl):
@@ -810,10 +861,16 @@ def overhead(cl, tl):
         return cl
     z = max(cl[2], tl[2] + 0.62 * hd)
     return (cl[0], cl[1], z)
+from mathutils import Quaternion
+LIFT = math.atan(0.36 * math.tan(math.atan(18 / 26)))   # subject ~68% down the frame
+def aim(cl, subj):
+    d = Vector(subj) - Vector(cl)
+    ax = d.cross(Vector((0, 0, 1))).normalized()
+    return tuple(Vector(cl) + Quaternion(ax, LIFT) @ d)
 cam_keys = [(f, overhead(cl, tl), tl) for f, cl, tl in cam_keys]
 for f, cl, tl in cam_keys:
     cam.location = cl; cam.keyframe_insert("location", frame=f)
-    target.location = tl; target.keyframe_insert("location", frame=f)
+    target.location = aim(cl, tl); target.keyframe_insert("location", frame=f)
 
 for o in bpy.data.objects:
     if o.type == 'FONT':
