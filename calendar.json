@@ -77,9 +77,10 @@
   "title": "What if you hung 1 million ornaments on one Christmas tree?",
   "category": "christmas",
   "status": "awaiting_approval",
-  "publish_at": "2026-11-01T16:00:00+03:00",
+  "publish_at": "2026-11-01T18:00:00+03:00",
   "planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=-6116118202263516820",
-  "video": "videos/2026-11-01-million-ornaments.mp4"
+  "video": "videos/2026-11-01-million-ornaments.mp4",
+  "note": "v2 three-problems story after user feedback"
  },
  {
   "day": 8,
