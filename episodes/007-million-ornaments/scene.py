@@ -1,4 +1,4 @@
-# Day 7 — What if you hung 1 million ornaments on one Christmas tree?  Build: python3 episodes/007-million-ornaments/scene.py
+# Day 7 (v2, 'three problems' story) — What if you hung 1 million ornaments on one Christmas tree?  Build: python3 episodes/007-million-ornaments/scene.py
 # Christmas special: snowy dusk version of the reference-style garden
 # Reference style: base (helpers, lawn/soil, house, garden) copied from episodes/003-lift-million-ref/scene.py
 import bpy, math, random, os, json
@@ -423,31 +423,33 @@ def make_set(n, r=0.06):
     return out
 SA, SB, SC = make_set(40), make_set(130, 0.055), make_set(230, 0.05)
 attach(tiers, xtree)
-S1, S3, S4 = S[1], S[3], S[4]
+S1 = S[1]
+S3 = T1000 = S[8]          # 1,000 then 10,000 ornaments within line 8
+S4 = T10K = S[8] + 9
+SNAPF = S[9] - 12          # on the word 'Snap!'
 for k, o in enumerate(SA):                      # hook: they rain on fast; stay as the "normal" tree
     ballpop(o, 2 + k // 3, 3)
 for k, o in enumerate(SB):
     r = o.scale[0]
     keyscale(o, [(0, 0.001), (3 + k // 6, 0.001), (5 + k // 6, r), (S1 - 3, r), (S1, 0.001),
-                 (S3 + k // 7, 0.001), (S3 + 3 + k // 7, r)])
+                 (S3 + k // 14, 0.001), (S3 + 3 + k // 14, r)])
 for k, o in enumerate(SC):
-    ballpop(o, S4 + k // 10, 3)
+    ballpop(o, S4 + k // 18, 3)
 # sagging: tiers squash + spread as the weight grows, back to normal for line 1
 for i, tg in enumerate(tiers):
-    keyscale(tg, [(0, 1.0), (24, (1.05, 1.05, 0.9)), (S1 - 2, (1.05, 1.05, 0.9)), (S1, 1.0), (S3 + 4, 1.0),
-                  (S3 + 16, (1.1, 1.1, 0.82)), (S4 + 2, (1.1, 1.1, 0.82)), (S4 + 22, (1.2, 1.2, 0.66)),
-                  (S[5] + 10, (1.22, 1.22, 0.6))])
+    keyscale(tg, [(0, 1.0), (24, (1.05, 1.05, 0.9)), (S1 - 2, (1.05, 1.05, 0.9)), (S1, 1.0), (S3, 1.0),
+                  (S3 + 8, (1.1, 1.1, 0.82)), (S4 + 1, (1.1, 1.1, 0.82)), (S4 + 14, (1.2, 1.2, 0.66)),
+                  (SNAPF - 2, (1.22, 1.22, 0.6))])
 # wobble under the load
-for f in range(S4 + 4, S[6], 6):
+for f in range(S4 + 4, SNAPF, 4):
     xtree.rotation_euler = (0, 0.04 * (1 if (f // 6) % 2 else -1), 0); xtree.keyframe_insert("rotation_euler", frame=f)
 # line 6: SNAP — the whole top falls over to the left
-SNAPF = S[6] + 4
 xtree.rotation_euler = (0, 0, 0); xtree.keyframe_insert("rotation_euler", frame=SNAPF)
 xtree.rotation_euler = (0, -1.5, 0.15); xtree.keyframe_insert("rotation_euler", frame=SNAPF + 9)
 xtree.rotation_euler = (0, -1.38, 0.15); xtree.keyframe_insert("rotation_euler", frame=SNAPF + 12)
 xtree.rotation_euler = (0, -1.45, 0.15); xtree.keyframe_insert("rotation_euler", frame=SNAPF + 15)
 # reset (off-camera, during the giant-tree shots): upright again, only set A
-RESET = S[12] + 6
+RESET = S[11] + 10
 xtree.keyframe_insert("rotation_euler", frame=RESET - 1)
 xtree.rotation_euler = (0, 0, 0); xtree.keyframe_insert("rotation_euler", frame=RESET)
 for tg in tiers:
@@ -475,7 +477,7 @@ for k in range(26):
     keyscale(o, [(0, 0.001), (SNAPF + 1, 0.001), (SNAPF + 2, 0.055), (land, 0.055), (land + 1, 0.001)])
     shards(p2, land, ci, 6, 0.3, 0.025)
 snap = text("Snap", "SNAP!", (TX - 0.4, TY - 0.6, 3.6), 0.55, red_lab, extrude=0.04)
-pop(snap, SNAPF, 4, S[7] + 2)
+pop(snap, SNAPF, 4, S[9] + 6)
 
 # ---------------- labels over the tree (upper frame) ----------------
 LZ = 3.75
@@ -484,10 +486,16 @@ def label(name, body, loc, size, m_, f_in, f_out):
     pop(t, f_in, 5, f_out)
     return t
 label("Q1M", "1,000,000?", (TX, TY - 0.5, LZ), 0.42, lab_m, 3, S1)
-label("L100", "~100", (TX, TY - 0.5, LZ), 0.6, white_lab, S1 + 3, S[2] + 2)
-label("L1000", "1,000", (TX, TY - 0.5, LZ), 0.6, lab_m, S3 + 3, S4)
-label("L10K", "10,000", (TX, TY - 0.5, LZ + 0.1), 0.55, lab_m, S4 + 2, S[5] + 1)
-label("L250", "= 250 KG", (TX, TY - 0.5, LZ - 0.5), 0.36, white_lab, S4 + 12, S[5] + 1)
+label("P1", "PROBLEM 1", (TX, TY - 0.5, LZ + 0.25), 0.4, lab_m, S1 + 2, S[2] + 1)
+label("P1b", "THE TREE", (TX, TY - 0.5, LZ - 0.32), 0.34, white_lab, S1 + 8, S[2] + 1)
+label("P2", "PROBLEM 2", (TX, TY - 0.5, LZ + 0.25), 0.4, lab_m, S[6] + 14, S[7] + 1)
+label("P2b", "WEIGHT", (TX, TY - 0.5, LZ - 0.32), 0.34, white_lab, S[6] + 20, S[7] + 1)
+label("P3", "PROBLEM 3", (TX, TY - 0.5, LZ + 0.25), 0.4, lab_m, S[12] + 2, S[13] + 1)
+label("P3b", "TIME", (TX, TY - 0.5, LZ - 0.32), 0.34, white_lab, S[12] + 8, S[13] + 1)
+label("L100", "~100", (TX, TY - 0.5, LZ), 0.6, white_lab, S[2] + 3, S[3] + 1)
+label("L1000", "1,000", (TX, TY - 0.5, LZ), 0.6, lab_m, S3 + 1, S4)
+label("L10K", "10,000", (TX, TY - 0.5, LZ + 0.1), 0.55, lab_m, S4 + 1, SNAPF)
+label("L250", "= 250 KG", (TX, TY - 0.5, LZ - 0.5), 0.36, white_lab, S4 + 6, SNAPF)
 
 # ---------------- line 2: one glass ball on a kitchen scale ----------------
 KX, KY = TX - 1.35, TY - 0.55
@@ -500,10 +508,10 @@ bigb = ball((KX, KY, 0.42), 0.22, 0)
 cap_m = mat("Cap", (0.9, 0.75, 0.3), 0.3, metal=0.9)
 capo = cyl("BallCap", (KX, KY, 0.66), 0.06, 0.07, cap_m, verts=12)
 for o in (kg, capo):
-    pop(o, S[2] - 2, 5, S3 + 2)
-ballpop(bigb, S[2] - 2, 5); ballgone(bigb, S3 + 2)
-label("L25g", "25 g", (KX, KY - 0.1, 1.25), 0.4, lab_m, S[2] + 6, S3 + 2)
-burst((KX, KY - 0.2, 0.42), S[2] + 4, 10, 0.32, 0.02, S[2] + 14)
+    pop(o, S[7] - 2, 5, S[8] + 1)
+ballpop(bigb, S[7] - 2, 5); ballgone(bigb, S[8] + 1)
+label("L25g", "25 g", (KX, KY - 0.1, 1.25), 0.4, lab_m, S[7] + 6, S[8] + 1)
+burst((KX, KY - 0.2, 0.42), S[7] + 4, 10, 0.32, 0.02, S[7] + 14)
 
 # ---------------- people (cartoon, built like day 6) ----------------
 skin_m = mat("Skin", (0.95, 0.74, 0.58), 0.6)
@@ -534,11 +542,8 @@ def person(x, y, shirt, k=1.0, hat=False):
     attach(ps, g)
     return g
 adults = []
-for j, (x, c) in enumerate([(1.45, (0.95, 0.3, 0.25)), (2.05, (0.2, 0.6, 0.3)), (2.65, (0.95, 0.75, 0.15))]):
-    p_ = person(x, TY + 0.1, c)
-    pop(p_, S[5] + j * 3, 5, S[7])
-    adults.append(p_)
-label("L3A", "= 3 ADULTS", (2.05, TY - 0.4, 4.1), 0.32, lab_m, S[5] + 6, S[6] + 2)
+for j, (x, c) in []:  # (v2: adults beat dropped)
+    pass
 for p_ in adults:   # they jump back when it snaps
     p_.keyframe_insert("location", frame=SNAPF)
     p_.location = (p_.location[0] + 0.3, p_.location[1], 0.35); p_.keyframe_insert("location", frame=SNAPF + 4)
@@ -554,10 +559,10 @@ for k in range(380):
     loc = (PX + R_ * math.sin(el_) * math.cos(a), PY + R_ * math.sin(el_) * math.sin(a), R_ * 1.15 * math.cos(el_))
     pp.append(ball(loc, random.uniform(0.32, 0.42)))
 attach(pp, pile)
-keyscale(pile, [(0, 0.001), (S[7] - 1, 0.001), (S[7] + 4, 0.25), (S[7] + 14, 0.5), (S[8], 0.55), (S[8] + 14, 0.72),
-                (S[9], 0.75), (S[9] + 14, 1.0), (S[12], 1.0), (S[12] + 1, 0.001)])
-label("L25T", "25 TONNES", (PX + 2.0, PY - 9.0, 11.5), 1.3, lab_m, S[7] + 4, S[9] + 2)
-label("LHouse", "≈ 1 HOUSE", (PX + 4.5, PY - 6.0, 16.5), 1.4, white_lab, S[9] + 6, S[10] + 4)
+keyscale(pile, [(0, 0.001), (S[9] - 1, 0.001), (S[9] + 4, 0.25), (S[9] + 14, 0.5), (S[10], 0.55), (S[10] + 14, 0.72),
+                (S[11], 0.75), (S[11] + 14, 1.0), (S[12], 1.0), (S[12] + 1, 0.001)])
+label("L25T", "25 TONNES", (PX + 2.0, PY - 9.0, 11.5), 1.3, lab_m, S[9] + 4, S[11] + 2)
+label("LHouse", "≈ 1 HOUSE", (PX + 4.5, PY - 6.0, 16.5), 1.4, white_lab, S[11] + 6, S[12])
 # four cartoon elephants
 ele_m = mat("Ele", (0.58, 0.6, 0.68), 0.75)
 ear_m = mat("EleEar", (0.85, 0.6, 0.65), 0.7)
@@ -576,9 +581,9 @@ for j, ex in enumerate([-12.2, -8.6, -5.0, -1.4]):
             ps.append(cyl("ELeg", (ex + lx, ey + sy * 0.5, 0.5), 0.3, 1.0, ele_m, verts=12))
     ps.append(tube("ETail", [(ex - 1.5, ey, 1.9), (ex - 1.9, ey, 1.2)], [0.06, 0.04], ele_m))
     attach(ps, g)
-    pop(g, S[8] + 2 + j * 3, 5, S[9] + 4 + j)
+    pop(g, S[10] + 2 + j * 3, 5, S[11] + 4 + j)
     elephants.append(g)
-label("L4E", "= 4 ELEPHANTS", (-6.8, 5.0, 9.6), 1.0, white_lab, S[8] + 8, S[9] + 2)
+label("L4E", "= 4 ELEPHANTS", (-6.8, 5.0, 9.6), 1.0, white_lab, S[10] + 8, S[11] + 2)
 
 # ---------------- lines 10-13: the 190 m giant tree vs the tallest real tree (116 m) ----------------
 GX, GY, GH = 0.0, 150.0, 190.0
@@ -602,7 +607,7 @@ for k in range(90):
     rr = r * (1 - t) + 1.0 * t + 0.8
     gp.append(sphere("GLight", (GX + rr * math.cos(a), GY + rr * math.sin(a), z + t * h), 0.7, bulb_m, sub=1))
 attach(gp, giant)
-keyscale(giant, [(0, 0.001), (S[10] - 1, 0.001), (S[10], (1, 1, 0.02)), (S[10] + 22, (1, 1, 1.05)), (S[10] + 27, 1.0), (S[14] - 4, 1.0), (S[14] - 2, 0.001)])
+keyscale(giant, [(0, 0.001), (S[3] - 1, 0.001), (S[3], (1, 1, 0.02)), (S[3] + 18, (1, 1, 1.05)), (S[3] + 23, 1.0), (S[6] - 4, 1.0), (S[6] - 2, 0.001)])
 # height bars + labels
 def hbar(name, x, y, h, m_, f_in, f_out):
     b = box(name, (x, y, 0), (2.2, 2.2, 1.0), m_)
@@ -611,8 +616,12 @@ def hbar(name, x, y, h, m_, f_in, f_out):
     keyscale(b, [(0, 0.001), (f_in - 1, 0.001), (f_in, (1, 1, 1)), (f_in + 16, (1, 1, h)), (f_out - 3, (1, 1, h)), (f_out, 0.001)])
     cap_ = box(name + "Cap", (x, y, h), (9, 2.2, 1.6), m_)
     pop(cap_, f_in + 16, 4, f_out)
-hbar("Bar190", GX + 48, GY - 40, GH, lab_m, S[11], S[14] - 2)
-label("L190", "190 M", (GX + 50, GY - 45, GH + 16), 24, lab_m, S[11] + 8, S[14] - 2)
+hbar("Bar190", GX + 48, GY - 40, GH, lab_m, S[3] + 8, S[6] - 2)
+label("L190", "190 M", (GX + 50, GY - 45, GH + 16), 24, lab_m, S[3] + 16, S[4] + 2)
+for sgn in (-1, 1):
+    xb = box("NoX", (GX, GY - 45, 100), (12, 3, 190), red_lab, rot=(0, sgn * 0.6, 0))
+    pop(xb, S[4] + 2 + (sgn + 1) * 2, 4, S[5] + 2)
+label("LNoE", "NOT ON EARTH", (GX - 5, GY - 50, GH + 30), 18, red_lab, S[4] + 6, S[5] + 2)
 # the record redwood (~116 m): tall narrow trunk + crown
 RX, RY, RH = -62.0, 150.0, 116.0
 red_g = group("Redwood", (RX, RY, 0))
@@ -621,10 +630,10 @@ for k in range(9):
     z = RH * (0.45 + k * 0.065)
     rp.append(sphere("RCrown", (RX + random.uniform(-4, 4), RY, z), 10 - k * 0.8, fir_m[k % 2], scale=(1.3, 1.1, 0.8), sub=1, smooth=False))
 attach(rp, red_g)
-keyscale(red_g, [(0, 0.001), (S[12] - 1, 0.001), (S[12], (1, 1, 0.02)), (S[12] + 18, (1, 1, 1.04)), (S[12] + 22, 1.0), (S[14] - 4, 1.0), (S[14] - 2, 0.001)])
-hbar("Bar116", RX - 26, RY - 40, RH, white_lab, S[13], S[14] - 2)
-label("L116", "116 M", (RX - 28, RY - 45, RH + 40), 22, white_lab, S[13] + 6, S[14] - 2)
-label("LTall", "TALLEST REAL TREE", (RX - 10, RY - 45, RH + 66), 12, white_lab, S[13] + 10, S[14] - 2)
+keyscale(red_g, [(0, 0.001), (S[5] - 1, 0.001), (S[5], (1, 1, 0.02)), (S[5] + 18, (1, 1, 1.04)), (S[5] + 22, 1.0), (S[6] - 4, 1.0), (S[6] - 2, 0.001)])
+hbar("Bar116", RX - 26, RY - 40, RH, white_lab, S[5] + 8, S[6] - 2)
+label("L116", "116 M", (RX - 28, RY - 45, RH + 40), 22, white_lab, S[5] + 14, S[6] - 2)
+label("LTall", "TALLEST REAL TREE", (RX - 10, RY - 45, RH + 66), 12, white_lab, S[5] + 18, S[6] - 2)
 
 # ---------------- lines 14-16: hanging them one by one (5 s each) ... then a bump ----------------
 LX, LY = TX + 1.05, TY - 0.15
@@ -641,13 +650,13 @@ helper.location = (LX + 0.08, LY, 0.76)
 attach([], helper)
 helper.rotation_euler = (0, 0, math.radians(-65)); helper["rz"] = math.radians(-65)
 for o in (ladder, helper):
-    pop(o, S[14] - 2, 5, S[17] + 30) if o is ladder else pop(o, S[14] - 2, 5)
+    pop(o, S[12] - 2, 5, S[17] + 30) if o is ladder else pop(o, S[12] - 2, 5)
 # a new ball appears on the tree on every reach (set D), counter label
 SD = make_set(28, 0.06)
 for o in SD:
     pass
 for k, o in enumerate(SD):
-    ballpop(o, S[14] + 4 + k * 4, 3)
+    ballpop(o, S[13] + 4 + k * 4, 3)
 # stopwatch
 WX, WY, WZ = TX - 1.15, TY - 0.6, 0.85
 watch = group("Watch", (WX, WY, WZ))
@@ -660,24 +669,39 @@ for k in range(12):
 attach(wp, watch)
 hand = group("WHand", (WX, WY - 0.05, WZ))
 attach([box("WHandB", (WX, WY - 0.05, WZ + 0.1), (0.025, 0.01, 0.2), red_lab)], hand)
-pop(watch, S[14] - 2, 5, S[15] + 4); pop(hand, S[14] - 2, 5, S[15] + 4)
-hand.rotation_euler = (0, 0, 0); hand.keyframe_insert("rotation_euler", frame=S[14])
-hand.rotation_euler = (0, 6.283 * 3, 0); hand.keyframe_insert("rotation_euler", frame=S[15] + 4)
-label("L5s", "1 EVERY 5 s", (TX, TY - 0.6, LZ), 0.36, white_lab, S[14] + 4, S[15])
+pop(watch, S[13] - 2, 5, S[14] + 4); pop(hand, S[13] - 2, 5, S[14] + 4)
+hand.rotation_euler = (0, 0, 0); hand.keyframe_insert("rotation_euler", frame=S[13])
+hand.rotation_euler = (0, 6.283 * 3, 0); hand.keyframe_insert("rotation_euler", frame=S[14] + 4)
+label("L5s", "1 EVERY 5 s", (TX, TY - 0.6, LZ), 0.36, white_lab, S[13] + 4, S[14])
 # line 15: 58 days — calendar + Zzz + sky turns to night and back fast
-label("L58", "58 DAYS", (TX, TY - 0.6, LZ), 0.55, lab_m, S[15] + 2, S[16])
-label("LNon", "NONSTOP", (TX, TY - 0.6, LZ - 0.55), 0.3, white_lab, S[15] + 8, S[16])
+label("L58", "58 DAYS", (TX, TY - 0.6, LZ), 0.55, lab_m, S[14] + 2, S[15])
+label("LNon", "NONSTOP", (TX, TY - 0.6, LZ - 0.55), 0.3, white_lab, S[14] + 8, S[15])
 CX_, CY_ = TX - 1.2, TY - 0.55
 cal = group("Cal", (CX_, CY_, 0.5))
 cp = [box("CalBody", (CX_, CY_, 0.55), (0.6, 0.06, 0.6), white_lab, bevel=0.02), box("CalTop", (CX_, CY_ - 0.005, 0.8), (0.6, 0.065, 0.14), red_lab),
       text("Cal58", "58", (CX_, CY_ - 0.05, 0.5), 0.34, mat("CalNum", (0.1, 0.1, 0.12), 0.5), extrude=0.01)]
 attach(cp, cal)
-pop(cal, S[15] + 2, 5, S[16] + 2)
+pop(cal, S[14] + 2, 5, S[15] + 1)
+def calendar(name, top, num, f_in, f_out, cross=False):
+    g = group(name, (CX_, CY_, 0.5))
+    ps = [box(name + "B", (CX_, CY_, 0.55), (0.62, 0.06, 0.62), white_lab, bevel=0.02), box(name + "T", (CX_, CY_ - 0.005, 0.8), (0.62, 0.065, 0.16), red_lab),
+          text(name + "Top", top, (CX_, CY_ - 0.045, 0.8), 0.12, white_lab, extrude=0.005),
+          text(name + "N", num, (CX_, CY_ - 0.05, 0.5), 0.34, mat(name + "NM", (0.1, 0.1, 0.12), 0.5), extrude=0.01)]
+    if cross:
+        for sg in (-1, 1):
+            ps.append(box(name + "X", (CX_, CY_ - 0.07, 0.55), (0.07, 0.02, 0.8), red_lab, rot=(0, sg * 0.75, 0)))
+    attach(ps, g)
+    pop(g, f_in, 5, f_out)
+    return g
+calendar("Cal29", "DEC", "29", S[15], S[16] + 1)
+label("LFin", "DONE: DEC 29", (TX - 0.45, TY - 0.6, LZ), 0.3, lab_m, S[15] + 4, S[16])
+calendar("Cal25", "DEC", "25", S[16], S[17] + 2, cross=True)
+label("LLate", "TOO LATE!", (TX, TY - 0.7, LZ), 0.4, red_lab, S[16] + 4, S[17])
 for k, (dx, dz) in enumerate([(0.25, 2.35), (0.4, 2.55), (0.58, 2.78)]):
     z_ = text("Zzz", "z", (LX + dx, LY - 0.2, dz), 0.18 + k * 0.06, white_lab, extrude=0.01)
-    pop(z_, S[15] + 8 + k * 4, 4, S[16])
+    pop(z_, S[14] + 8 + k * 4, 4, S[15])
 # line 16: bump — the ladder knocks the tree, balls rain off and smash
-BUMP = S[16] + 4
+BUMP = S[16] + 10   # he dozes off and bumps the tree
 ladder.rotation_euler = (0, 0, 0); ladder.keyframe_insert("rotation_euler", frame=BUMP - 2)
 ladder.rotation_euler = (0, -0.25, 0); ladder.keyframe_insert("rotation_euler", frame=BUMP + 2)
 ladder.rotation_euler = (0, 0, 0); ladder.keyframe_insert("rotation_euler", frame=BUMP + 8)
@@ -702,7 +726,6 @@ for o in fall:
     keyscale(fb, [(0, 0.001), (BUMP, 0.001), (BUMP + 1, 0.06), (land, 0.06), (land + 1, 0.001)])
     shards(p2, land, ci, 6, 0.28, 0.022)
 sc.frame_set(0)
-label("Crash", "CRASH!", (TX, TY - 0.7, LZ), 0.62, red_lab, BUMP + 6, S[17])
 q = text("Q", "?", (TX + 0.3, TY - 0.6, LZ + 0.3), 1.4, lab_m, extrude=0.08)
 pop(q, S[17] + 2, 6)
 q.rotation_euler = (math.radians(90), 0, 0); q.keyframe_insert("rotation_euler", frame=S[17] + 2)
@@ -735,37 +758,40 @@ TC = (TX, TY, 1.15)
 cam_keys = [
     (0,          (0.9, -3.6, 1.8),   TC),                              # hook: balls rain onto the tree
     (S[1] - 4,   (-0.5, -3.3, 1.7),  TC),
-    (S[1] + 2,   (0.6, -3.0, 1.5),   TC),                              # normal ~100
-    (S[2] - 4,   (-0.2, -2.8, 1.4),  (TX - 0.4, TY, 0.9)),
-    (S[2] + 2,   (KX + 0.35, KY - 1.7 - (TY - 1.2), 0.9), (KX, KY, 0.35)),          # 25 g ball on the scale
-    (S[3] - 2,   (KX - 0.3, KY - 1.6 - (TY - 1.2), 0.85), (KX, KY, 0.35)),
-    (S[3] + 2,   (1.0, -3.4, 1.7),   TC),                              # 1,000 sag
-    (S[4] - 2,   (-0.9, -3.1, 1.6),  TC),
-    (S[4] + 2,   (0.2, -2.7, 1.3),   TC),                              # 10,000
-    (S[5] - 2,   (0.9, -3.3, 1.6),   TC),
-    (S[5] + 2,   (1.6, -4.6, 2.0),   (1.1, TY, 1.0)),                   # 3 adults
-    (S[6] - 2,   (0.7, -4.4, 1.9),   (1.1, TY, 1.0)),
-    (S[6] + 2,   (-0.4, -3.9, 1.5),  (TX - 0.5, TY, 0.7)),              # SNAP
-    (S[7] - 2,   (-1.4, -4.4, 1.9),  (TX - 1.0, TY, 0.5)),
-    (S[7] + 2,   (-3.0, -9.0, 6.5),  (PX + 1.5, PY - 6.0, 1.5)),        # 25 tonne pile grows
-    (S[8] - 2,   (-5.5, -9.5, 7.0),  (PX + 1.0, PY - 6.0, 1.8)),
-    (S[8] + 2,   (-9.0, -9.0, 7.0),  (-6.0, 7.6, 1.6)),                 # 4 elephants
-    (S[9] - 2,   (-4.5, -9.6, 7.0),  (-6.0, 7.6, 1.6)),
-    (S[9] + 2,   (2.0, -12.0, 9.0),  (-3.0, PY - 3.0, 2.5)),             # pile ~ house
-    (S[10] - 2,  (-1.0, -13.0, 9.5), (-3.0, PY - 3.0, 2.5)),
-    (S[10] + 2,  (3.0, -14.0, 6.0),  (0.0, 60.0, 40.0)),                 # giant tree grows behind the house
-    (S[11] - 2,  (10.0, -60.0, 20.0), (0.0, 120.0, 70.0)),
-    (S[11] + 4,  (30.0, -150.0, 40.0), (5.0, 140.0, 70.0)),              # 190 m
-    (S[12] - 2,  (10.0, -175.0, 45.0), (0.0, 140.0, 70.0)),
-    (S[12] + 2,  (-10.0, -190.0, 45.0), (-25.0, 140.0, 65.0)),           # redwood rises
-    (S[13] - 2,  (-40.0, -195.0, 45.0), (-30.0, 140.0, 65.0)),
-    (S[13] + 4,  (-55.0, -185.0, 45.0), (-30.0, 140.0, 65.0)),           # 116 m
-    (S[14] - 4,  (-20.0, -200.0, 50.0), (-25.0, 140.0, 65.0)),
-    (S[14] - 2,  (1.3, -3.5, 1.7),   (TX + 0.3, TY, 1.0)),                # ladder + stopwatch
-    (S[15] - 2,  (-0.6, -3.3, 1.6),  (TX - 0.2, TY, 1.0)),
-    (S[15] + 2,  (0.8, -3.6, 1.8),   (TX - 0.1, TY, 1.0)),                # 58 days
-    (S[16] - 2,  (-0.3, -3.2, 1.6),  (TX, TY, 1.0)),
-    (S[16] + 2,  (0.4, -3.0, 1.4),   (TX + 0.1, TY, 0.8)),                # crash
+    (S[1] + 2,   (0.6, -3.0, 1.5),   TC),                              # problem 1: the tree
+    (S[2] - 2,   (-0.6, -3.2, 1.6),  TC),
+    (S[2] + 2,   (0.4, -2.8, 1.4),   TC),                              # normal ~100
+    (S[3] - 2,   (-0.3, -3.0, 1.5),  TC),
+    (S[3] + 2,   (3.0, -14.0, 6.0),  (0.0, 60.0, 40.0)),               # 190 m giant grows behind the house
+    (S[3] + 20,  (10.0, -60.0, 20.0), (0.0, 120.0, 70.0)),
+    (S[4] - 2,   (30.0, -150.0, 40.0), (5.0, 140.0, 70.0)),
+    (S[4] + 2,   (20.0, -165.0, 42.0), (0.0, 140.0, 70.0)),             # not on Earth
+    (S[5] - 2,   (10.0, -175.0, 45.0), (0.0, 140.0, 70.0)),
+    (S[5] + 2,   (-10.0, -190.0, 45.0), (-25.0, 140.0, 65.0)),          # record redwood 116 m
+    (S[6] - 4,   (-40.0, -195.0, 45.0), (-30.0, 140.0, 65.0)),
+    (S[6] - 2,   (0.6, -3.4, 1.7),   TC),                              # fine, normal tree; problem 2
+    (S[7] - 4,   (-0.4, -3.0, 1.5),  TC),
+    (S[7] + 2,   (KX + 0.35, KY - 1.7 - (TY - 1.2), 0.9), (KX, KY, 0.35)),   # 25 g ball on the scale
+    (S[8] - 2,   (KX - 0.3, KY - 1.6 - (TY - 1.2), 0.85), (KX, KY, 0.35)),
+    (S[8] + 2,   (1.0, -3.4, 1.7),   TC),                              # 1,000 -> 10,000, sag
+    (SNAPF - 2,  (0.2, -2.9, 1.4),   TC),
+    (SNAPF + 2,  (-0.4, -3.9, 1.5),  (TX - 0.5, TY, 0.7)),              # SNAP
+    (S[9] - 2,   (-1.4, -4.4, 1.9),  (TX - 1.0, TY, 0.5)),
+    (S[9] + 2,   (-3.0, -9.0, 6.5),  (PX + 1.5, PY - 6.0, 1.5)),        # 25 tonne pile grows
+    (S[10] - 2,  (-5.5, -9.5, 7.0),  (PX + 1.0, PY - 6.0, 1.8)),
+    (S[10] + 2,  (-9.0, -9.0, 7.0),  (-6.0, 7.6, 1.6)),                 # 4 elephants
+    (S[11] - 2,  (-4.5, -9.6, 7.0),  (-6.0, 7.6, 1.6)),
+    (S[11] + 2,  (2.0, -12.0, 9.0),  (-3.0, PY - 3.0, 2.5)),             # pile ~ house
+    (S[12] - 2,  (-1.0, -13.0, 9.5), (-3.0, PY - 3.0, 2.5)),
+    (S[12] + 2,  (1.3, -3.5, 1.7),   (TX + 0.3, TY, 1.0)),                # problem 3: time (ladder)
+    (S[13] - 2,  (0.4, -3.2, 1.6),   (TX + 0.3, TY, 1.0)),
+    (S[13] + 2,  (-0.6, -3.3, 1.6),  (TX - 0.2, TY, 1.0)),                # every 5 s
+    (S[14] - 2,  (0.3, -3.0, 1.5),   (TX - 0.2, TY, 1.0)),
+    (S[14] + 2,  (0.8, -3.6, 1.8),   (TX - 0.1, TY, 1.0)),                # 58 days
+    (S[15] - 2,  (-0.3, -3.2, 1.6),  (TX, TY, 1.0)),
+    (S[15] + 2,  (-0.9, -3.0, 1.5),  (TX - 0.5, TY, 0.9)),                # Dec 29
+    (S[16] - 2,  (-0.3, -3.1, 1.5),  (TX - 0.4, TY, 0.9)),
+    (S[16] + 2,  (0.4, -3.0, 1.4),   (TX + 0.1, TY, 0.8)),                # too late + bump crash
     (S[17] - 2,  (-0.4, -3.2, 1.5),  (TX + 0.1, TY, 0.8)),
     (S[17] + 4,  (0.9, -3.8, 1.8),   TC),                                # question
     (FRAMES - 1, (0.2, -4.2, 2.0),   TC),
