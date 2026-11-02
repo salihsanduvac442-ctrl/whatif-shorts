@@ -87,7 +87,11 @@
   "date": "2026-11-02",
   "title": "What if you laid a billion dollars end to end?",
   "category": "money",
-  "status": "todo"
+  "status": "awaiting_approval",
+  "publish_at": "2026-11-02T16:00:00+03:00",
+  "planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=-1065383388615195878",
+  "video": "videos/2026-11-02-billion-end-to-end.mp4",
+  "metricool_post_id": 413613043
  },
  {
   "day": 9,
