@@ -1,0 +1,16 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Never Stop Diving</title>
+<style>
+@font-face{font-family:'Jost';src:url('fonts/Jost.ttf') format('truetype');font-weight:100 900;}
+html,body{margin:0;background:#F2E6D0;overflow:hidden}canvas{position:absolute;left:0;top:0;display:block}
+</style>
+</head><body><canvas id="c"></canvas>
+<script type="module">
+const cv = document.getElementById('c'); cv.width = innerWidth; cv.height = innerHeight;
+const g = cv.getContext('2d');
+for (const w of [400, 500, 600, 700]) await document.fonts.load(`${w} 40px Jost`);
+const film = await import('./film.js');
+window.DUR = film.DUR; window.EV = film.events();
+window.render = t => { g.setTransform(1, 0, 0, 1, 0, 0); film.render(g, t, cv.width, cv.height); };
+window.READY = true;
+</script></body></html>

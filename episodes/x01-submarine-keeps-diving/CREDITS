@@ -1,0 +1,4 @@
+Voice: Kokoro (Apache-2.0), voice am_michael
+Font: Jost (SIL OFL 1.1), fonts/Jost-OFL.txt
+Music and sound effects: synthesized in code (mix.py)
+Engine: adapted from lemo-opuscar iso-infographic style (MIT)

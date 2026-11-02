@@ -1,0 +1,93 @@
+[
+ {
+  "id": "h0",
+  "text": "This submarine never stops diving.",
+  "sub": "This submarine never stops diving.",
+  "voice": "am_michael",
+  "speed": 1.18
+ },
+ {
+  "id": "l01",
+  "text": "Forty meters. Divers turn back.",
+  "sub": "40 m. Divers turn back.",
+  "voice": "am_michael",
+  "speed": 1.18
+ },
+ {
+  "id": "l02",
+  "text": "Two hundred. The sunlight's gone.",
+  "sub": "200 m. The sunlight's gone.",
+  "voice": "am_michael",
+  "speed": 1.18
+ },
+ {
+  "id": "l03",
+  "text": "One thousand. Pitch black.",
+  "sub": "1,000 m. Pitch black.",
+  "voice": "am_michael",
+  "speed": 1.18
+ },
+ {
+  "id": "l04",
+  "text": "Two thousand. Sperm whales hunt here.",
+  "sub": "2,000 m. Sperm whales hunt here.",
+  "voice": "am_michael",
+  "speed": 1.18
+ },
+ {
+  "id": "l05",
+  "text": "Thirty-eight hundred. The Titanic.",
+  "sub": "3,800 m. The Titanic.",
+  "voice": "am_michael",
+  "speed": 1.18
+ },
+ {
+  "id": "l06",
+  "text": "Six thousand. The hadal zone.",
+  "sub": "6,000 m. The hadal zone.",
+  "voice": "am_michael",
+  "speed": 1.18
+ },
+ {
+  "id": "l07",
+  "text": "Eighty-three hundred. The deepest fish ever filmed.",
+  "sub": "8,336 m. The deepest fish ever filmed.",
+  "voice": "am_michael",
+  "speed": 1.18
+ },
+ {
+  "id": "l08",
+  "text": "Almost eleven thousand. The bottom of the ocean.",
+  "sub": "10,935 m. The bottom of the ocean.",
+  "voice": "am_michael",
+  "speed": 1.18
+ },
+ {
+  "id": "l09",
+  "text": "The pressure? Over a thousand times the surface.",
+  "sub": "Pressure: over 1,000× the surface.",
+  "voice": "am_michael",
+  "speed": 1.18
+ },
+ {
+  "id": "l10",
+  "text": "But it doesn't stop.",
+  "sub": "But it doesn't stop.",
+  "voice": "am_michael",
+  "speed": 1.18
+ },
+ {
+  "id": "l11",
+  "text": "Twelve thousand. Deeper than any hole we've ever dug.",
+  "sub": "12,262 m. Deeper than any hole we've ever dug.",
+  "voice": "am_michael",
+  "speed": 1.18
+ },
+ {
+  "id": "l12",
+  "text": "And it's still going. How deep do you think it gets?",
+  "sub": "Still going… How deep do you think it gets?",
+  "voice": "am_michael",
+  "speed": 1.18
+ }
+]
