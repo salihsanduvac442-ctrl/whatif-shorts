@@ -570,11 +570,11 @@ label("LHook2", "KRILL?", SP(V0, 16, 0.33), 0.95, white_lab, 6, S[1], face=CAM0)
 # whale: mouth open in the hook, hidden from line 1 to line 9, then swims in
 keyscale(hero, [(0, WS), (S[1] - 1, WS), (S[1], 0.001), (S[9] - 1, 0.001), (S[9], WS)])
 keyrot(hjaw, [(0, (0, 0.0, 0)), (8, (0, 0.55, 0)), (S[1] - 2, (0, 0.5, 0)), (S[1], (0, 0, 0))])
-key_loc(hero, [(0, (WH0[0] - 3, WH0[1], WH0[2])), (S[1] - 1, WH0), (S[9], (-62.0, 7.0, 6.5)), (S[9] + 20, WH0)])
+key_loc(hero, [(0, (WH0[0] - 3, WH0[1], WH0[2])), (S[1] - 1, WH0), (S[9], (-40.0, 7.0, 6.5)), (S[10] - 2, WH0)])
 
 # ---------------- lines 1-3: one krill on the garden table (6 cm), 1 g on a scale, 1,000 krill = 1 kg ----------------
 hk = krill("HeroKrill", (TX, TY, TZ + 0.012), 0.06, rz=-0.35)
-key_loc(hk, [(S[1], (TX + 0.05, TY + 0.1, TZ + 0.12)), (S[1] + 6, (TX, TY, TZ + 0.012)),
+key_loc(hk, [(S[1], (TX + 0.05, TY + 0.1, TZ + 0.12)), (S[1] + 12, (TX, TY, TZ + 0.012)),
              (S[2], (TX, TY, TZ + 0.012)), (S[2] + 4, (TX, TY, TZ + 0.05)), (S[2] + 7, (TX, TY, TZ + SCH + 0.014)),
              (S[3] + 8, (TX, TY, TZ + SCH + 0.014)), (S[3] + 14, (TX, TY - 0.02, TZ + SCH + 0.075))])
 keyrot(hk, [(S[1], (0, -0.5, 0.4)), (S[1] + 6, (0, 0, -0.35)), (S[2] + 4, (0, -0.3, -0.35)), (S[2] + 7, (0, 0, -0.35))])
@@ -693,23 +693,23 @@ keyscale(cube, [(S[8] + 2, 1.0), (S[8] + 14, (1.0, 1.0, 0.001)), (S[8] + 15, 0.0
 V9 = ((20.0, -22.0, 10.0), (2.0, 7.0, 4.0))
 CAM9 = CL(V9)
 label("LBW", "BLUE WHALE ≈ 25 m", SP(V9, 26, 0.28), 1.05, white_lab, S[9] + 14, S[10], face=CAM9)
-LUNGE = S[10] + 14
+LUNGE = S[11] - 2
 WH1 = (2.0, 7.0, 5.5)
 key_loc(hero, [(S[10], WH0), (LUNGE, WH1)])
-keyrot(hjaw, [(S[10], (0, 0, 0)), (S[10] + 6, (0, 0.75, 0)), (S[10] + 18, (0, 0.7, 0)), (S[10] + 24, (0, 0.1, 0)),
+keyrot(hjaw, [(S[10], (0, 0, 0)), (S[10] + 12, (0, 0.75, 0)), (S[11] + 4, (0, 0.7, 0)), (S[11] + 14, (0, 0.1, 0)),
               (S[11] + 4, (0, 0.12, 0)), (S[12], (0, 0.0, 0))])
 P0 = tuple(hpouch.scale)
-keyscale(hpouch, [(S[10] + 6, P0), (S[10] + 20, (P0[0] * 1.05, P0[1] * 1.35, P0[2] * 2.3)), (S[12] - 2, (P0[0] * 1.05, P0[1] * 1.35, P0[2] * 2.3)),
+keyscale(hpouch, [(S[10] + 12, P0), (S[11] + 8, (P0[0] * 1.05, P0[1] * 1.35, P0[2] * 2.3)), (S[12] - 2, (P0[0] * 1.05, P0[1] * 1.35, P0[2] * 2.3)),
                   (S[12] + 6, P0)])
 MOUTH1 = Vector(mouth_world(WH1))
 for j, (ko, v) in enumerate(cloud_k):
-    f0 = S[10] + 4 + int(j / len(cloud_k) * 12)
+    f0 = S[10] + 6 + int(j / len(cloud_k) * 20)
     ko.keyframe_insert("location", frame=f0); ko.keyframe_insert("scale", frame=f0)
     ko.location = tuple(MOUTH1 - CLOUD + Vector((random.uniform(-1, 1), random.uniform(-1, 1), random.uniform(-0.5, 0.5))))
-    ko.keyframe_insert("location", frame=f0 + 6)
-    ko.scale = (0.001,) * 3; ko.keyframe_insert("scale", frame=f0 + 6)
-key_loc(blob, [(S[10] + 6, tuple(CLOUD)), (S[10] + 18, tuple(MOUTH1))])
-keyscale(blob, [(S[10] + 6, 1.0), (S[10] + 18, 0.001)])
+    ko.keyframe_insert("location", frame=f0 + 14)
+    ko.scale = (0.001,) * 3; ko.keyframe_insert("scale", frame=f0 + 14)
+key_loc(blob, [(S[10] + 10, tuple(CLOUD)), (S[11] + 6, tuple(MOUTH1))])
+keyscale(blob, [(S[10] + 10, 1.0), (S[11] + 6, 0.001)])
 V10 = ((22.0, -15.0, 8.0), (8.0, 7.0, 4.0))
 label("LGulp", "GULP!", SP(V10, 20, 0.28), 1.6, red_lab, S[10] + 8, S[11], face=CL(V10))
 # line 11: a water ball the same size as the whale's body appears next to it
@@ -731,17 +731,17 @@ for i in range(16):
     attach([box("CrateB", (cx_, cy_, 0.5), (1.0, 1.0, 1.0), ktex_m, bevel=0.05),
             text("CrateT", "1 T", (cx_, cy_ - 0.52, 0.5), 0.36, white_lab, extrude=0.02)], cg)
     pop(cg, S[12] + 2 + i, 3)
-    f0 = S[13] + 2 + i * 2
-    key_loc(cg, [(f0, (cx_, cy_, 0.5)), (f0 + 7, tuple(MOUTH1))])
-    keyscale(cg, [(f0, 1.0), (f0 + 7, 0.001)])
-    keyrot(cg, [(f0, (0, 0, 0)), (f0 + 7, (1.5, 0.8, 0.5))])
+    f0 = S[13] + 1 + int(i * 1.5)
+    key_loc(cg, [(f0, (cx_, cy_, 0.5)), (f0 + 12, tuple(MOUTH1))])
+    keyscale(cg, [(f0, 1.0), (f0 + 12, 0.001)])
+    keyrot(cg, [(f0, (0, 0, 0)), (f0 + 12, (1.5, 0.8, 0.5))])
     crates.append(cg)
 label("L16T", "16 TONS / DAY", SP(V12, 9, 0.24), 0.48, lab_m, S[12] + 6, S[13] + 2, face=CAM12)
 V13 = ((9.0, -19.0, 9.5), (8.0, 4.0, 2.5))
 CAM13 = CL(V13)
 label("L16M", "16,000,000 KRILL", SP(V13, 20, 0.25), 0.95, pink_lab, S[13] + 2, S[14], face=CAM13)
 label("L16D", "EVERY DAY", SP(V13, 20, 0.33), 0.85, white_lab, S[13] + 6, S[14], face=CAM13)
-for j, f in enumerate(range(S[13] + 2, S[14] - 2, 4)):
+for j, f in enumerate(range(S[13] + 2, S[14] - 2, 7)):
     hjaw.rotation_euler = (0, 0.45 if j % 2 == 0 else 0.08, 0); hjaw.keyframe_insert("rotation_euler", frame=f)
 hjaw.rotation_euler = (0, 0, 0); hjaw.keyframe_insert("rotation_euler", frame=S[14])
 
@@ -816,37 +816,37 @@ tr.track_axis = 'TRACK_NEGATIVE_Z'; tr.up_axis = 'UP_Y'
 KT = (TX, TY, TZ + 0.03)
 cam_keys = [
     (0,          V0[0],                      V0[1]),                          # hook: whale + krill cloud
-    (S[1] - 2,   (7.0, -9.0, 7.0),           V0[1]),
-    (S[1],       (TX + 0.14, TY - 0.26, 0.9), KT),                           # one krill (6 cm)
-    (S[2] - 2,   (TX - 0.06, TY - 0.27, 0.9), KT),
-    (S[2] + 2,   (TX + 0.22, TY - 0.42, 1.0), (TX, TY, TZ + 0.04)),          # 1 gram
-    (S[3] - 2,   (TX + 0.05, TY - 0.46, 1.0), (TX, TY, TZ + 0.04)),
-    (S[3] + 2,   (TX - 0.2, TY - 0.5, 1.05),  (TX, TY, TZ + 0.06)),          # 1,000 = 1 kg
-    (S[4] - 2,   (TX + 0.1, TY - 0.62, 1.1),  (TX, TY, TZ + 0.06)),
+    (S[1] - 1,   (7.0, -9.0, 7.0),           V0[1]),
+    (S[1],       V1[0],                      V1[1]),                          # one krill (6 cm)
+    (S[2] - 1,   (TX - 0.06, TY - 0.27, 0.9), V1[1]),
+    (S[2],       V2[0],                      V2[1]),                          # 1 gram
+    (S[3] - 1,   (TX + 0.05, TY - 0.46, 1.0), V2[1]),
+    (S[3],       V3[0],                      V3[1]),                          # 1,000 = 1 kg
+    (S[4] - 1,   (TX + 0.1, TY - 0.62, 1.1),  V3[1]),
     (S[4],       (0.6, -7.6, 3.0),           (1.9, -0.2, 0.5)),               # 1 tonne vs car
-    (S[5] - 2,   CAM4,                       (1.9, -0.2, 0.5)),
+    (S[5] - 1,   CAM4,                       (1.9, -0.2, 0.5)),
     (S[5],       (2.0, -21.0, 11.0),         V5[1]),                          # the billion cube
     (S[6],       V5[0],                      V5[1]),
-    (S[7] - 2,   (8.0, -27.0, 15.0),         V5[1]),
+    (S[7] - 1,   (8.0, -27.0, 15.0),         V5[1]),
     (S[7],       (-7.0, -21.0, 31.0),        V7[1]),                          # 7 whales
-    (S[8],       V7[0],                      V7[1]),
-    (S[8] + 4,   (-9.5, -21.0, 37.0),        V8[1]),                          # 20 pools
-    (S[9] - 2,   V8[0],                      V8[1]),
+    (S[8] - 1,   V7[0],                      V7[1]),
+    (S[8],       (-9.5, -21.0, 37.0),        V8[1]),                          # 20 pools
+    (S[9] - 1,   V8[0],                      V8[1]),
     (S[9],       V9[0],                      V9[1]),                          # hungry whale arrives
-    (S[10] - 2,  (17.0, -20.0, 9.0),         (3.0, 7.0, 4.0)),
-    (S[10] + 3,  V10[0],                     V10[1]),                         # gulp
-    (S[11] - 2,  (24.0, -13.0, 8.0),         (9.0, 7.0, 4.0)),
-    (S[11] + 2,  V11[0],                     V11[1]),                         # gulp = body
-    (S[12] - 2,  (16.0, -22.0, 9.0),         V11[1]),
-    (S[12] + 2,  V12[0],                     V12[1]),                         # 16 tonnes
-    (S[13] - 2,  (7.8, -11.5, 6.0),          V12[1]),
-    (S[13] + 4,  V13[0],                     V13[1]),                         # 16 million krill
-    (S[14] - 2,  (7.0, -20.0, 10.0),         (7.0, 5.0, 2.5)),
-    (S[14] + 3,  V14[0],                     V14[1]),                         # billion cube back
+    (S[10] - 1,  (17.0, -20.0, 9.0),         (3.0, 7.0, 4.0)),
+    (S[10],      V10[0],                     V10[1]),                         # gulp
+    (S[11] - 1,  (24.0, -13.0, 8.0),         (9.0, 7.0, 4.0)),
+    (S[11],      V11[0],                     V11[1]),                         # gulp = body
+    (S[12] - 1,  (16.0, -22.0, 9.0),         V11[1]),
+    (S[12],      V12[0],                     V12[1]),                         # 16 tonnes
+    (S[13] - 1,  (7.8, -11.5, 6.0),          V12[1]),
+    (S[13],      V13[0],                     V13[1]),                         # 16 million krill
+    (S[14] - 1,  (7.0, -20.0, 10.0),         (7.0, 5.0, 2.5)),
+    (S[14],      V14[0],                     V14[1]),                         # billion cube back
     (S[15],      (8.0, -27.0, 13.0),         (8.0, 7.0, 3.0)),
-    (S[16] - 2,  (11.0, -26.0, 13.0),        (10.0, 7.0, 3.0)),               # ~2 months
-    (S[16] + 14, (8.0, -95.0, 70.0),         (2.0, 500.0, 40.0)),             # swarms km wide
-    (S[17] - 2,  V16[0],                     V16[1]),
+    (S[16] - 1,  (11.0, -26.0, 13.0),        (10.0, 7.0, 3.0)),               # ~2 months
+    (S[16],      (8.0, -95.0, 70.0),         (2.0, 500.0, 40.0)),             # swarms km wide
+    (S[17] - 1,  V16[0],                     V16[1]),
     (S[17],      V17[0],                     V17[1]),                         # question
     (FRAMES - 1, (-2.1, -4.7, 2.4),          (PX0, PY0, 0.95)),
 ]
@@ -863,7 +863,7 @@ def fcurves(o_):
     except AttributeError:
         from bpy_extras import anim_utils
         return list(anim_utils.action_get_channelbag_for_slot(ad.action, ad.action_slot).fcurves)
-CUTS = (S[1], S[4], S[5], S[7], S[9], S[17])
+CUTS = tuple(S[k] for k in (1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17))
 for o_ in (cam, target):
     for fc in fcurves(o_):
         pts = fc.keyframe_points
