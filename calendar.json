@@ -108,7 +108,11 @@
   "date": "2026-11-04",
   "title": "What if you stayed underwater too long?",
   "category": "body",
-  "status": "todo"
+  "status": "awaiting_approval",
+  "publish_at": "2026-11-04T16:00:00+03:00",
+  "planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=-222150066939278400",
+  "video": "videos/2026-11-04-underwater.mp4",
+  "metricool_post_id": 416238728
  },
  {
   "day": 11,
