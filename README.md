@@ -98,6 +98,10 @@ Added 2026-10-27 because "what happens to your body if..." facts get a lot of vi
    Scene length = narration length + 0.7 s at 24 fps, keyframes placed at the `timing.json` line starts.
    Camera framing: 9:16 portrait, lens 26 mm ⇒ only about ±4.3 units are visible horizontally at 11 units distance;
    put every detail inside that window and IN FRONT of cut faces (not buried behind them).
+   Main-subject rule (Salih, Nov 4): videos do best when the central object is seen from FAR AWAY yet
+   perfectly CLEAR — prefer wide, distant perspective shots that show the subject's whole surroundings,
+   with the subject small but crisp, centered, high-contrast and never covered by captions.
+   If a calendar entry has a `framing` field, follow it.
    Save `scene.blend`, render previews `python3 pipeline/render.py episodes/NNN-slug 40 8 <frames...>`,
    look at them, fix, then full render `python3 pipeline/render.py episodes/NNN-slug` (~10 s/frame).
 5. Optional `style.json` (badge + highlight words), then `python3 pipeline/compose.py episodes/NNN-slug videos/DATE-slug.mp4`.
