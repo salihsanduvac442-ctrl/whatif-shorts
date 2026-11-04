@@ -342,6 +342,8 @@ def overhead(cl, tl):
     hd = math.hypot(dx, dy)
     if cl[2] > 60 or hd > 40 or cl[0] < -5e5:
         return cl
+    if cl[2] < 0 and cl[1] < FRONT_Y - 1.0:     # front view through the pool cut face: keep it level
+        return cl
     z = max(cl[2], tl[2] + 0.62 * hd)
     return (cl[0], cl[1], z)
 LIFT = math.atan(0.36 * math.tan(math.atan(18 / 26)))   # subject ~68% down the frame
@@ -410,7 +412,7 @@ eyeb = mat("EyeB", (0.03, 0.03, 0.04), 0.3)
 bub_m = mat("Bubble", (0.85, 0.95, 1.0), 0.05, emit=(0.8, 0.95, 1.0), emit_strength=0.6)
 
 def fit(body, D, size):
-    return min(size, 0.85 * D / max(len(body), 4))
+    return min(size, (0.8 if D <= 3.0 else 0.85) * D / max(len(body), 4))
 def parent_to(o, p):
     bpy.context.view_layer.update()
     mw = o.matrix_world.copy()
@@ -488,15 +490,15 @@ for sx in (-1, 1):
     cheeks.append(c_)
 # mouth bubbles while underwater
 for k, f0 in enumerate(range(JUMP1 + 8, S[12], 11)):
-    b_ = sphere("MBub", MOUTH, random.uniform(0.035, 0.06), bub_m, sub=2)
+    b_ = sphere("MBub", MOUTH, random.uniform(0.05, 0.085), bub_m, sub=2)
     hide_until(b_, f0)
     key_loc(b_, [(f0, MOUTH), (f0 + 26, (MOUTH[0] + random.uniform(-0.15, 0.15), MOUTH[1] - 0.05, WTOP - 0.03))])
     gone_at(b_, f0 + 27, 1)
 
 V0 = ((0.6, -7.8, 3.0), (PX - 2.0, PY + 0.3, -0.3))
 CAM0 = CL(V0)
-label("LHook", "UNDERWATER", SP(V0, 9, 0.31), fit("UNDERWATER", 9, 0.62), blue_lab, 4, S[1], face=CAM0)
-label("LHook2", "TOO LONG?", SP(V0, 9, 0.38), fit("TOO LONG?", 9, 0.62), white_lab, 9, S[1], face=CAM0)
+label("LHook", "UNDERWATER", SP(V0, 9.0, 0.31), fit("UNDERWATER", 9.0, 0.62), blue_lab, 4, S[1], face=CAM0)
+label("LHook2", "TOO LONG?", SP(V0, 9.0, 0.38), fit("TOO LONG?", 9.0, 0.62), white_lab, 9, S[1], face=CAM0)
 
 # ---------------- line 1: stopwatch 30-90 s ----------------
 SW = (PX + 1.75, PY - 0.25, -1.25)
@@ -514,9 +516,9 @@ attach([box("SWHandB", (SW[0], SW[1] - 0.1, SW[2] + 0.15), (0.03, 0.02, 0.32), r
 pop(sw_g, S[1], 5, S[2]); pop(hand, S[1], 5, S[2])
 keyrot(hand, [(S[1], (0, 0, 0)), (S[2], (0, 6.283 * 1.5, 0))])
 for fc in []: pass
-V1 = ((PX + 2.4, PY - 3.6, -0.6), (PX + 0.9, PY, -0.9))
+V1 = ((PX + 1.6, PY - 4.6, -0.95), (PX + 0.85, PY, -1.38))
 CAM1 = CL(V1)
-label("L3090", "30 - 90 SEC", SP(V1, 3.4, 0.32), fit("30 - 90 SEC", 3.4, 0.3), lab_m, S[1] + 3, S[2], face=CAM1)
+label("L3090", "30 - 90 SEC", SP(V1, 2.6, 0.32), fit("30 - 90 SEC", 2.6, 0.5), lab_m, S[1] + 3, S[2], face=CAM1)
 
 # ---------------- line 2: x-ray on: skin & clothes go see-through, glowing organs ----------------
 for m_ in (skin_y, shirt_y, pants_y, hair_y):
@@ -548,9 +550,9 @@ pop_t(brain, BRS, S[2] + 4, S[12] + 2)
 for l_ in lungs:
     pop_t(l_, LUS, S[2] + 5, S[12] + 2)
 pop_t(spleen, SPS, S[2] + 7, S[12] + 2)
-V2 = ((PX + 0.9, PY - 3.2, -1.0), (PX, PY, -0.40))
+V2 = ((PX + 0.5, PY - 4.2, -1.0), (PX, PY, -1.38))
 CAM2 = CL(V2)
-label("LXray", "X-RAY", SP(V2, 2.2, 0.31), fit("X-RAY", 2.2, 0.26), blue_lab, S[2] + 3, S[3], face=CAM2)
+label("LXray", "X-RAY", SP(V2, 2.4, 0.31), fit("X-RAY", 2.4, 0.5), blue_lab, S[2] + 3, S[3], face=CAM2)
 xglow = glow_mat("XGlow", (0.5, 0.9, 1.0), 3.0)
 for k in range(3):
     bpy.ops.mesh.primitive_torus_add(major_radius=0.6, minor_radius=0.018, location=TORSO, rotation=(math.radians(90), 0, 0))
@@ -562,14 +564,14 @@ ice_m = mat("Ice", (0.75, 0.92, 1.0), 0.1, emit=(0.6, 0.9, 1.0), emit_strength=1
 for k in range(14):
     a = k / 14 * 6.283
     p = Vector(HEAD) + Vector((0.42 * math.cos(a), -0.28, 0.34 * math.sin(a)))
-    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=0.05, location=tuple(p))
+    bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=0.075, location=tuple(p))
     o = bpy.context.object; o.data.materials.append(ice_m); o.scale = (0.5, 0.5, 1.6); o.rotation_euler = (0, a, 0)
     keyscale(o, [(0, 0.001), (S[3] + k // 2, 0.001), (S[3] + k // 2 + 3, (0.6, 0.6, 1.9)), (S[3] + k // 2 + 5, (0.5, 0.5, 1.6)),
                  (S[4] - 3, (0.5, 0.5, 1.6)), (S[4], 0.001)])
     key_loc(o, [(S[3] + k // 2, tuple(p + Vector((0.25 * math.cos(a), -0.1, 0.25 * math.sin(a))))), (S[3] + k // 2 + 6, tuple(p))])
-V3 = ((PX + 0.5, PY - 1.9, -0.7), (PX, PY, -0.68))
+V3 = ((PX + 0.4, PY - 3.7, -0.9), (PX, PY, -1.38))
 CAM3 = CL(V3)
-label("LCold", "COLD WATER!", SP(V3, 1.5, 0.30), fit("COLD WATER!", 1.5, 0.16), blue_lab, S[3] + 2, S[4], face=CAM3)
+label("LCold", "COLD WATER!", SP(V3, 2.4, 0.30), fit("COLD WATER!", 2.4, 0.5), blue_lab, S[3] + 2, S[4], face=CAM3)
 wc = water_m.node_tree.nodes["Principled BSDF"].inputs["Emission Strength"]
 for f, v in [(0, 0.15), (S[3], 0.15), (S[3] + 3, 0.9), (S[3] + 10, 0.15)]:
     wc.default_value = v; wc.keyframe_insert("default_value", frame=f)
@@ -588,9 +590,9 @@ for b in beats:
 hk += [(S[12] - 1, HES), (S[12] + 2, 0.001)]
 keyscale(heart, hk)
 ecg_m = glow_mat("ECG", (0.3, 1.0, 0.45), 4.0)
-V4 = ((PX + 0.6, PY - 2.0, -1.15), (PX, PY, -0.67))
+V4 = ((PX + 0.5, PY - 3.7, -1.0), (PX, PY, -1.38))
 CAM4 = CL(V4)
-label("LSlow", "HEART SLOWS", SP(V4, 1.45, 0.29), fit("HEART SLOWS", 1.45, 0.13), red_lab, S[4] + 2, S[5], face=CAM4)
+label("LSlow", "HEART SLOWS", SP(V4, 2.4, 0.29), fit("HEART SLOWS", 2.4, 0.5), red_lab, S[4] + 2, S[5], face=CAM4)
 # ECG line: fast spikes before, slow after
 def ecg(name, pts_x, spikes, ctr, w, f_in, f_out):
     pts = []
@@ -608,7 +610,7 @@ def ecg_pts(org, width, n_spikes, h):
                 (x0 + seg * 0.6, org[1], org[2] - h * 0.4), (x0 + seg * 0.7, org[1], org[2])]
     pts.append((org[0] + width, org[1], org[2]))
     return pts
-E0 = Vector(SP(V4, 1.4, 0.38, -0.12))
+E0 = Vector(SP(V4, 2.4, 0.38, -0.12))
 fast = tube("ECGFast", ecg_pts(tuple(E0 - Vector((0.22, 0, 0))), 0.44, 6, 0.06), [0.006] * 31, ecg_m)
 slow = tube("ECGSlow", ecg_pts(tuple(E0 - Vector((0.22, 0, 0))), 0.44, 2, 0.06), [0.006] * 11, ecg_m)
 for o in (fast, slow):
@@ -620,15 +622,15 @@ blood_m = mat("Blood", (0.95, 0.1, 0.12), 0.35, emit=(1.0, 0.1, 0.1), emit_stren
 for sx in (-1, 1):
     path = [P_(sx * 0.38, -0.08, 0.78), P_(sx * 0.38, -0.05, 1.05), P_(sx * 0.3, -0.03, 1.33), P_(sx * 0.1, -0.05, 1.18), P_(0.04, -0.1, 1.1)]
     for k in range(9):
-        b_ = sphere("RBC", path[0], 0.035, blood_m, scale=(1, 1, 0.45), sub=2)
+        b_ = sphere("RBC", path[0], 0.05, blood_m, scale=(1, 1, 0.45), sub=2)
         f0 = S[5] + k * 3
         keyscale(b_, [(0, 0.001), (f0 - 1, 0.001), (f0, 1.0), (f0 + 16, 1.0), (f0 + 17, 0.001)])
         key_loc(b_, [(f0 + i * 4, p) for i, p in enumerate(path)])
 arm_m = [shirt_y]
-V5 = ((PX - 0.7, PY - 3.2, -1.0), (PX, PY, -0.45))
+V5 = ((PX - 0.6, PY - 4.2, -1.0), (PX, PY, -1.38))
 CAM5 = CL(V5)
-label("LCore", "ARMS", SP(V5, 2.3, 0.30, -0.2), fit("ARMS", 2.3, 0.2), white_lab, S[5] + 2, S[6], face=CAM5)
-label("LCore2", "TO CORE!", SP(V5, 2.3, 0.37, 0.12), fit("TO CORE!", 2.3, 0.22), red_lab, S[5] + 8, S[6], face=CAM5)
+label("LCore", "ARMS", SP(V5, 2.4, 0.30, -0.2), fit("ARMS", 2.4, 0.5), white_lab, S[5] + 2, S[6], face=CAM5)
+label("LCore2", "TO CORE!", SP(V5, 2.4, 0.37, 0.12), fit("TO CORE!", 2.4, 0.5), red_lab, S[5] + 8, S[6], face=CAM5)
 
 # ---------------- line 6: spleen squeezes out extra red cells ----------------
 keyscale(spleen, [(S[6] + 2, SPS), (S[6] + 6, (0.4, 0.4, 0.8)), (S[6] + 10, SPS), (S[6] + 14, (0.4, 0.4, 0.8)), (S[6] + 18, SPS)])
@@ -636,29 +638,29 @@ for k in range(22):
     a = random.uniform(0, 6.283); r_ = random.uniform(0.15, 0.45)
     p0 = Vector(P_(0.2, -0.02, 0.93))
     p1 = p0 + Vector((r_ * math.cos(a), -0.12, r_ * math.sin(a) * 1.2))
-    b_ = sphere("RBC2", tuple(p0), 0.03, blood_m, scale=(1, 1, 0.45), sub=2)
+    b_ = sphere("RBC2", tuple(p0), 0.045, blood_m, scale=(1, 1, 0.45), sub=2)
     f0 = S[6] + 4 + (k % 3) * 4
     keyscale(b_, [(0, 0.001), (f0 - 1, 0.001), (f0, 1.0), (S[7] - 2, 1.0), (S[7], 0.001)])
     key_loc(b_, [(f0, tuple(p0)), (f0 + 8, tuple(p1))])
     b_.rotation_euler = (random.uniform(0, 3), random.uniform(0, 3), 0)
-V6 = ((PX + 0.8, PY - 2.0, -1.25), (PX + 0.1, PY, -0.72))
+V6 = ((PX + 0.6, PY - 3.7, -1.05), (PX + 0.05, PY, -1.38))
 CAM6 = CL(V6)
-label("LSpleen", "SPLEEN", SP(V6, 1.4, 0.29), fit("SPLEEN", 1.4, 0.13), mat("LabPu", (0.8, 0.4, 1.0), 0.4, emit=(0.75, 0.35, 1.0), emit_strength=1.4), S[6] + 2, S[7], face=CAM6)
-label("LSpl2", "+ RED CELLS", SP(V6, 1.4, 0.36), fit("+ RED CELLS", 1.4, 0.11), red_lab, S[6] + 7, S[7], face=CAM6)
+label("LSpleen", "SPLEEN", SP(V6, 2.4, 0.29), fit("SPLEEN", 2.4, 0.5), mat("LabPu", (0.8, 0.4, 1.0), 0.4, emit=(0.75, 0.35, 1.0), emit_strength=1.4), S[6] + 2, S[7], face=CAM6)
+label("LSpl2", "+ RED CELLS", SP(V6, 2.4, 0.36), fit("+ RED CELLS", 2.4, 0.5), red_lab, S[6] + 7, S[7], face=CAM6)
 
 # ---------------- line 7: CO2 builds up (grey bubbles fill the chest) ----------------
 co2_m = mat("CO2", (0.55, 0.55, 0.6), 0.5, emit=(0.5, 0.5, 0.55), emit_strength=0.3)
 co2s = []
 for k in range(36):
     p = Vector(TORSO) + Vector((random.uniform(-0.22, 0.22), random.uniform(-0.16, 0.05), random.uniform(-0.3, 0.35)))
-    b_ = sphere("CO2b", tuple(p), random.uniform(0.03, 0.055), co2_m, sub=2)
+    b_ = sphere("CO2b", tuple(p), random.uniform(0.045, 0.075), co2_m, sub=2)
     f0 = S[7] + int(k * 0.9)
     keyscale(b_, [(0, 0.001), (f0 - 1, 0.001), (f0 + 2, 1.0), (S[9] - 1, 1.0), (S[9] + 2, 0.001)])
     co2s.append(b_)
-V7 = ((PX - 0.7, PY - 2.4, -1.0), (PX, PY, -0.62))
+V7 = ((PX - 0.5, PY - 3.8, -1.0), (PX, PY, -1.38))
 CAM7 = CL(V7)
-label("LCO2", "CO2", SP(V7, 1.6, 0.29), fit("CO2", 1.6, 0.22), grey_lab, S[7] + 2, S[8], face=CAM7)
-label("LCO2b", "BUILDING UP", SP(V7, 1.6, 0.37), fit("BUILDING UP", 1.6, 0.12), white_lab, S[7] + 6, S[8], face=CAM7)
+label("LCO2", "CO2", SP(V7, 2.4, 0.29), fit("CO2", 2.4, 0.5), grey_lab, S[7] + 2, S[8], face=CAM7)
+label("LCO2b", "BUILDING UP", SP(V7, 2.4, 0.37), fit("BUILDING UP", 2.4, 0.5), white_lab, S[7] + 6, S[8], face=CAM7)
 
 # ---------------- line 8: burning urge to breathe (lungs glow orange, flames) ----------------
 lc = lung_m.node_tree.nodes["Principled BSDF"].inputs["Emission Color"]
@@ -673,13 +675,13 @@ flame2 = glow_mat("Flame2", (1.0, 0.85, 0.2), 6.0)
 for k in range(10):
     sx = -1 if k < 5 else 1
     p = P_(sx * (0.06 + (k % 5) * 0.035), -0.13, 1.08 + (k % 2) * 0.05)
-    fl = cyl("Flame", p, 0.035, 0.14, flame_m if k % 2 else flame2, r2=0.0, verts=8)
+    fl = cyl("Flame", p, 0.05, 0.2, flame_m if k % 2 else flame2, r2=0.0, verts=8)
     f0 = S[8] + 2 + k
     flames.append(fl)
     keyscale(fl, [(0, 0.001), (f0 - 1, 0.001)] + [(f0 + j * 3, (1, 1, 1.3 if j % 2 else 0.8)) for j in range(0, (S[9] - f0) // 3)] + [(S[9], 0.001)])
-V8 = ((PX + 0.6, PY - 2.1, -1.05), (PX, PY, -0.62))
+V8 = ((PX + 0.4, PY - 3.7, -1.0), (PX, PY, -1.38))
 CAM8 = CL(V8)
-label("LBurn", "BURN!", SP(V8, 1.4, 0.29), fit("BURN!", 1.4, 0.2), mat("LabO", (1.0, 0.5, 0.1), 0.4, emit=(1.0, 0.45, 0.05), emit_strength=1.6), S[8] + 2, S[9], face=CAM8)
+label("LBurn", "BURN!", SP(V8, 2.4, 0.29), fit("BURN!", 2.4, 0.5), mat("LabO", (1.0, 0.5, 0.1), 0.4, emit=(1.0, 0.45, 0.05), emit_strength=1.6), S[8] + 2, S[9], face=CAM8)
 
 # ---------------- line 9: chest twitches and jerks ----------------
 jit = [(S[9], (0, 0, 0))]
@@ -693,10 +695,10 @@ tk = [(S[9], TS)]
 for f in range(S[9] + 2, S[10] - 2, 4):
     tk += [(f, (TS[0] * 1.08, TS[1] * 1.15, TS[2] * 0.95)), (f + 2, TS)]
 keyscale(Y["torso"], tk)
-V9 = ((PX + 1.3, PY - 3.6, -0.9), (PX, PY, -0.45))
+V9 = ((PX + 0.8, PY - 4.4, -0.95), (PX, PY, -1.38))
 CAM9 = CL(V9)
-label("LTw", "TWITCH!", SP(V9, 2.8, 0.29), fit("TWITCH!", 2.8, 0.3), lab_m, S[9] + 2, S[10] - 2, face=CAM9)
-label("LTw2", "JERK!", SP(V9, 2.8, 0.37, 0.15), fit("JERK!", 2.8, 0.3), red_lab, S[9] + 12, S[10], face=CAM9)
+label("LTw", "TWITCH!", SP(V9, 2.6, 0.29), fit("TWITCH!", 2.6, 0.5), lab_m, S[9] + 2, S[10] - 2, face=CAM9)
+label("LTw2", "JERK!", SP(V9, 2.6, 0.37, 0.15), fit("JERK!", 2.6, 0.5), red_lab, S[9] + 12, S[10], face=CAM9)
 
 # ---------------- line 10: oxygen keeps dropping (O2 meter in the water) ----------------
 MX_, MY_ = PX + 1.75, PY - 0.2
@@ -727,13 +729,13 @@ for f in range(S[14], S[15], 6):     # flashing "low" in line 14
     es.default_value = 0.6; es.keyframe_insert("default_value", frame=f + 3)
 es.default_value = 1.5; es.keyframe_insert("default_value", frame=S[15] + 2)
 o2dots_m = mat("O2Dot", (0.3, 0.6, 1.0), 0.3, emit=(0.3, 0.6, 1.0), emit_strength=2.0)
-V10 = ((PX + 2.4, PY - 4.0, -0.9), (PX + 0.9, PY, -0.45))
+V10 = ((PX + 1.5, PY - 4.6, -0.95), (PX + 0.85, PY, -1.38))
 CAM10 = CL(V10)
-label("LO2", "OXYGEN", SP(V10, 3.0, 0.29), fit("OXYGEN", 3.0, 0.3), blue_lab, S[10] + 2, S[11], face=CAM10)
-label("LO2b", "DROPPING!", SP(V10, 3.0, 0.37), fit("DROPPING!", 3.0, 0.27), red_lab, S[10] + 8, S[11], face=CAM10)
+label("LO2", "OXYGEN", SP(V10, 2.6, 0.29), fit("OXYGEN", 2.6, 0.5), blue_lab, S[10] + 2, S[11], face=CAM10)
+label("LO2b", "DROPPING!", SP(V10, 2.6, 0.37), fit("DROPPING!", 2.6, 0.5), red_lab, S[10] + 8, S[11], face=CAM10)
 for k in range(12):   # blue O2 dots leave the body and fade
     p0 = Vector(TORSO) + Vector((random.uniform(-0.2, 0.2), -0.2, random.uniform(-0.3, 0.3)))
-    d_ = sphere("O2Dot", tuple(p0), 0.045, o2dots_m, sub=2)
+    d_ = sphere("O2Dot", tuple(p0), 0.065, o2dots_m, sub=2)
     f0 = S[10] + 2 + k * 2
     keyscale(d_, [(0, 0.001), (f0 - 1, 0.001), (f0, 1.0), (f0 + 10, 0.5), (f0 + 14, 0.001)])
     key_loc(d_, [(f0, tuple(p0)), (f0 + 14, tuple(p0 + Vector((random.uniform(-0.6, 0.6), -0.2, random.uniform(-0.6, 0.2)))))])
@@ -744,14 +746,14 @@ for f, v in [(0, 0.8), (S[11], 0.8), (S[11] + 6, 4.0), (S[12] - 2, 4.0), (S[12] 
     bs_.default_value = v; bs_.keyframe_insert("default_value", frame=f)
 for k in range(14):
     p0 = Vector(TORSO) + Vector((random.uniform(-0.2, 0.2), -0.15, random.uniform(-0.35, 0.0)))
-    d_ = sphere("O2Dot2", tuple(p0), 0.04, o2dots_m, sub=2)
+    d_ = sphere("O2Dot2", tuple(p0), 0.06, o2dots_m, sub=2)
     f0 = S[11] + k * 2
     keyscale(d_, [(0, 0.001), (f0 - 1, 0.001), (f0, 1.0), (f0 + 10, 1.0), (f0 + 11, 0.001)])
     key_loc(d_, [(f0, tuple(p0)), (f0 + 10, P_(random.uniform(-0.08, 0.08), -0.05, 1.73))])
-V11 = ((PX - 0.5, PY - 1.9, -0.55), (PX, PY, -0.53))
+V11 = ((PX - 0.4, PY - 3.7, -0.85), (PX, PY, -1.38))
 CAM11 = CL(V11)
-label("LBrain", "BRAIN USES", SP(V11, 1.45, 0.27), fit("BRAIN USES", 1.45, 0.11), white_lab, S[11] + 2, S[12], face=CAM11)
-label("LBrain2", "20% OF YOUR O2", SP(V11, 1.45, 0.34), fit("20% OF YOUR O2", 1.45, 0.12), lab_m, S[11] + 6, S[12], face=CAM11)
+label("LBrain", "BRAIN USES", SP(V11, 2.4, 0.27), fit("BRAIN USES", 2.4, 0.5), white_lab, S[11] + 2, S[12], face=CAM11)
+label("LBrain2", "20% OF YOUR O2", SP(V11, 2.4, 0.34), fit("20% OF YOUR O2", 2.4, 0.5), lab_m, S[11] + 6, S[12], face=CAM11)
 
 # ---------------- line 12: black out (lights dim, eyes close, body drifts) ----------------
 sun_e = sun.data
@@ -765,18 +767,18 @@ for e in Y["eyes"]:
 for e in Y["pupils"]:
     keyscale(e, [(S[12] + 2, 1.0), (S[12] + 5, 0.001), (S[13] - 1, 0.001), (S[13] + 1, 1.0)])
 keyrot(you, [(S[12] + 2, (0, 0, 0)), (S[12] + 14, (0.25, 0.18, 0)), (S[13] - 1, (0.3, 0.2, 0)), (S[13], (0, 0, 0))])
-V12 = ((PX + 1.2, PY - 3.3, -0.9), (PX, PY, -0.45))
+V12 = ((PX + 0.7, PY - 4.3, -0.95), (PX, PY, -1.38))
 CAM12 = CL(V12)
-label("LBO", "BLACKOUT", SP(V12, 2.3, 0.30), fit("BLACKOUT", 2.3, 0.28), red_lab, S[12] + 3, S[13], face=CAM12)
+label("LBO", "BLACKOUT", SP(V12, 2.4, 0.30), fit("BLACKOUT", 2.4, 0.5), red_lab, S[12] + 3, S[13], face=CAM12)
 for k in range(5):
     z_ = text(f"Zzz{k}", "z", tuple(Vector(HEAD) + Vector((0.3 + k * 0.08, -0.25, 0.25 + k * 0.12))), 0.08 + k * 0.03, white_lab)
     pop(z_, S[12] + 6 + k * 2, 3, S[13])
 
 # ---------------- line 13: zero warning (warning sign with "0") ----------------
 warn_m = mat("Warn", (1.0, 0.8, 0.05), 0.4, emit=(1.0, 0.75, 0.05), emit_strength=1.2)
-V13 = ((PX + 1.7, PY - 3.8, -0.8), (PX + 0.4, PY, -0.45))
+V13 = ((PX + 1.2, PY - 4.6, -0.95), (PX + 0.6, PY, -1.38))
 CAM13 = CL(V13)
-WP = Vector(SP(V13, 3.0, 0.29, 0.12))
+WP = Vector(SP(V13, 2.6, 0.29, 0.12))
 wg = group("WarnG", tuple(WP))
 tri = cyl("WarnTri", tuple(WP), 0.26, 0.04, warn_m, rot=(math.radians(90), 0, 0), verts=3)
 tri.rotation_euler = (math.radians(90), math.radians(-90), 0)
@@ -789,20 +791,20 @@ for sgn in (-1, 1):
     parent_to(cb, wg)
     hide_until(cb, S[13] + 9)
 pop(wg, S[13] + 1, 5, S[14])
-label("LNoW", "NO WARNING", SP(V13, 2.6, 0.38), fit("NO WARNING", 2.6, 0.2), red_lab, S[13] + 9, S[14], face=CAM13)
+label("LNoW", "NO WARNING", SP(V13, 2.4, 0.38), fit("NO WARNING", 2.4, 0.5), red_lab, S[13] + 9, S[14], face=CAM13)
 
 # ---------------- line 14: even when you feel totally fine (thumbs up vs O2 flashing red) ----------------
 keyrot(Y["arms"][1], [(S[14], (0, -0.35, 0)), (S[14] + 5, (0, -2.3, 0)), (S[15] - 1, (0, -2.3, 0)), (S[15] + 3, (0, -0.35, 0))])
-V14 = ((PX + 1.9, PY - 4.0, -0.8), (PX + 0.8, PY, -0.45))
+V14 = ((PX + 1.4, PY - 4.6, -0.95), (PX + 0.8, PY, -1.38))
 CAM14 = CL(V14)
-bub = sphere("SpeechB", SP(V14, 3.0, 0.31, -0.1), 0.3, white_lab, scale=(1.75, 0.08, 0.6), sub=3)
+bub = sphere("SpeechB", SP(V14, 2.6, 0.31, -0.1), 0.3, white_lab, scale=(1.75, 0.08, 0.6), sub=3)
 BUBS = (1.75, 0.08, 0.6)
 keyscale(bub, [(0, 0.001), (S[14] + 1, 0.001), (S[14] + 5, BUBS), (S[15] - 3, BUBS), (S[15], 0.001)])
-t_ = text("SpeechT", "I FEEL FINE!", tuple(Vector(SP(V14, 2.9, 0.31, -0.1))), 0.11, eyeb)
+t_ = text("SpeechT", "I FEEL FINE!", tuple(Vector(SP(V14, 2.5, 0.31, -0.1))), 0.11, eyeb)
 t_.rotation_euler = (math.radians(90), 0, math.atan2(CAM14[0] - t_.location.x, -(CAM14[1] - t_.location.y)))
 bub.rotation_euler = t_.rotation_euler.copy(); bub.rotation_euler[0] = 0
 pop(t_, S[14] + 3, 4, S[15])
-label("LLow", "O2 LOW!", SP(V14, 3.0, 0.37, 0.22), fit("O2 LOW!", 3.0, 0.22), red_lab, S[14] + 8, S[15], face=CAM14)
+label("LLow", "O2 LOW!", SP(V14, 2.6, 0.37, 0.22), fit("O2 LOW!", 2.6, 0.5), red_lab, S[14] + 8, S[15], face=CAM14)
 
 # ---------------- line 15: never swim alone: buddy + ring buoy, you float up safely ----------------
 skin_b = mat("SkinB", (0.75, 0.52, 0.36), 0.6)
@@ -939,9 +941,7 @@ tr.track_axis = 'TRACK_NEGATIVE_Z'; tr.up_axis = 'UP_Y'
 def drift(v, dx=0.0, dy=0.0, dz=0.0):
     return (v[0][0] + dx, v[0][1] + dy, v[0][2] + dz)
 VIEWS = [V0, V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15, V16, V17, V18]
-DR = [(-1.2, 2.0, -1.0), (-0.4, 0.6, 0), (-0.3, 0.45, 0), (0.25, 0.3, 0), (-0.25, 0.3, 0), (0.5, 0.4, 0), (-0.3, 0.3, 0),
-      (0.4, 0.35, 0), (-0.25, 0.3, 0), (-0.4, 0.5, 0), (-0.5, 0.5, 0), (0.25, 0.3, 0), (-0.3, 0.7, 0), (-0.4, 0.5, 0),
-      (-0.5, 0.4, 0), (-1.4, 1.0, 0.3), (-2.0, 1.0, 0.5), (2.0, -5.0, 1.0), (-0.4, 0.4, 0)]
+DR = [(-1.2, 2.0, -1.0), (0.0, -0.15, 0.05), (0.0, -0.15, 0.05), (0.0, -0.15, 0.05), (0.0, -0.15, 0.05), (0.0, -0.15, 0.05), (0.0, -0.15, 0.05), (0.0, -0.15, 0.05), (0.0, -0.15, 0.05), (0.0, -0.15, 0.05), (0.0, -0.15, 0.05), (0.0, -0.15, 0.05), (0.0, -0.15, 0.05), (0.0, -0.15, 0.05), (0.0, -0.15, 0.05), (-1.4, 1.0, 0.3), (-2.0, 1.0, 0.5), (2.0, -5.0, 1.0), (-0.4, 0.4, 0)]
 cam_keys = []
 for i, v in enumerate(VIEWS):
     f_a = S[i]
