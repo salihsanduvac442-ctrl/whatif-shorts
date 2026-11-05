@@ -120,9 +120,13 @@
   "date": "2026-11-05",
   "title": "What if a storm cloud sucked you up and never let go?",
   "category": "rare accident",
-  "status": "todo",
+  "status": "awaiting_approval",
   "note": "True story: Ewa Wisniewska, paraglider, 2007 Australia, sucked into a thunderstorm to ~9,946 m and survived. Altitude meter HUD with real milestones (cloud base, freezing level, hail, lightning, oxygen loss ~ -40C, blacked out, ice-covered, descended and landed alive) — escalating flow like the plane/submarine Shorts.",
-  "framing": "Keep the paraglider (woman + canopy) small but crisp in a WIDE, distant perspective shot: the whole towering storm cloud around her, she is always clearly visible and centered (strong contrast, never hidden by captions). The farther and clearer the main subject, the better the video does."
+  "framing": "Keep the paraglider (woman + canopy) small but crisp in a WIDE, distant perspective shot: the whole towering storm cloud around her, she is always clearly visible and centered (strong contrast, never hidden by captions). The farther and clearer the main subject, the better the video does.",
+  "publish_at": "2026-11-05T16:00:00+03:00",
+  "planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=-7554251814324649926",
+  "video": "videos/2026-11-05-storm-cloud.mp4",
+  "metricool_post_id": 417431934
  },
  {
   "day": 12,
