@@ -145,7 +145,11 @@
   "date": "2026-11-07",
   "title": "What if everyone on Earth got a million dollars?",
   "category": "money",
-  "status": "todo"
+  "status": "awaiting_approval",
+  "publish_at": "2026-11-07T16:00:00+03:00",
+  "planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=8800380232455506744",
+  "video": "videos/2026-11-07-million-everyone.mp4",
+  "metricool_post_id": 419720617
  },
  {
   "day": 14,
