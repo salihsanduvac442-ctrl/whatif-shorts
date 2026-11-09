@@ -167,7 +167,11 @@
   "date": "2026-11-09",
   "title": "What if you never slept again?",
   "category": "body",
-  "status": "todo"
+  "status": "awaiting_approval",
+  "publish_at": "2026-11-09T16:00:00+03:00",
+  "planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=-3893674061411824010",
+  "video": "videos/2026-11-09-never-sleep.mp4",
+  "metricool_post_id": 421412618
  },
  {
   "day": 16,
