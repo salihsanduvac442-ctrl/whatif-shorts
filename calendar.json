@@ -200,11 +200,11 @@
   "date": "2026-11-12",
   "title": "What if 1 billion ants tried to lift your house?",
   "category": "tiny army",
-  "status": "awaiting_approval",
-  "publish_at": "2026-11-12T16:00:00+03:00",
+  "status": "scheduled",
+  "publish_at": "2026-11-12T16:56:00+03:00",
   "planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=-6289121151424312428",
   "video": "videos/2026-11-12-billion-ants.mp4",
-  "metricool_post_id": 425326552
+  "metricool_post_id": 425685471
  },
  {
   "day": 19,
