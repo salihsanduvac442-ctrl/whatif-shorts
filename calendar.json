@@ -233,7 +233,11 @@
   "date": "2026-11-15",
   "title": "What if a billion dollars was pure gold?",
   "category": "money",
-  "status": "todo"
+  "status": "awaiting_approval",
+  "publish_at": "2026-11-15T16:00:00+03:00",
+  "planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=-7872315124949365309",
+  "video": "videos/2026-11-15-billion-gold.mp4",
+  "metricool_post_id": 428641919
  },
  {
   "day": 22,
