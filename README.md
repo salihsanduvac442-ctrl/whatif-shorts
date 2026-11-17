@@ -7,6 +7,7 @@ same style (never repeat a title), then produce as usual.
 
 One 3D "What if...?" YouTube Short per day, published through Metricool.
 **YouTube only (Salih, 2026-10-31): he closed TikTok — do NOT create TikTok posts any more.**
+**Publishing (Salih, 2026-11-17): no approval needed any more — schedule each Short LIVE (draft false) and send him the video for information.**
 `calendar.json` holds one topic per day (day, date, title, category, status). From day 3, odd days are body / extreme-science
 topics, rotating daily from 2026-10-28: money → tiny army → body → weird animal (rare accidents take a slot when a
 series runs out). Christmas / New Year specials are slotted in on fixed dates (Nov 1 test, Dec 6, 13, 20, 24, 25, 31,
