@@ -277,7 +277,11 @@
   "date": "2026-11-19",
   "title": "What if you stacked a trillion dollars?",
   "category": "money",
-  "status": "todo"
+  "status": "scheduled",
+  "publish_at": "2026-11-19T16:00:00+03:00",
+  "planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=-7502645059364762472",
+  "video": "videos/2026-11-19-trillion-stack.mp4",
+  "metricool_post_id": 433824130
  },
  {
   "day": 26,
