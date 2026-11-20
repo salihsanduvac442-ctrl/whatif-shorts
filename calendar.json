@@ -288,7 +288,11 @@
   "date": "2026-11-20",
   "title": "What if 1 billion locusts flew over your town?",
   "category": "tiny army",
-  "status": "todo"
+  "status": "scheduled",
+  "publish_at": "2026-11-20T16:00:00+03:00",
+  "planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=-2431958308541477680",
+  "video": "videos/2026-11-20-billion-locusts.mp4",
+  "metricool_post_id": 435191560
  },
  {
   "day": 27,
