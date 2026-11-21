@@ -299,7 +299,11 @@
   "date": "2026-11-21",
   "title": "What if your heart stopped for 10 minutes?",
   "category": "body",
-  "status": "todo"
+  "status": "scheduled",
+  "publish_at": "2026-11-21T16:00:00+03:00",
+  "planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=2574255046119148793",
+  "video": "videos/2026-11-21-heart-stops.mp4",
+  "metricool_post_id": 436419910
  },
  {
   "day": 28,
