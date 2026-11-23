@@ -321,7 +321,11 @@
   "date": "2026-11-23",
   "title": "What if you spent $1,000 a day until a billion ran out?",
   "category": "money",
-  "status": "todo"
+  "status": "scheduled",
+  "publish_at": "2026-11-23T16:00:00+03:00",
+  "planner_url": "https://app.metricool.com/planner/calendar?blogId=7400439&openWithPostUuid=5874025202332156418",
+  "video": "videos/2026-11-23-billion-spend.mp4",
+  "metricool_post_id": 438368748
  },
  {
   "day": 30,
